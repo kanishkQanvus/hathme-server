@@ -37,6 +37,11 @@ const userSchema = mongoose.Schema({
         type: String,
         // required: true,
     },
+    languageCode: {
+      type: String,
+      // required: true,
+      default: 'en'
+    },
     deviceName: {
         type: String,
       

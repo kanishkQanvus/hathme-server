@@ -1,6 +1,5 @@
 const loginMaster = require("../model/loginMaster-model");
 const bcrypt = require("bcryptjs");
-const geoip = require('geoip-lite');
 const jwt = require("jsonwebtoken");
 const userMasterModel = require("../model/userMaster-model");
 const constants = require("../constants");
@@ -230,7 +229,9 @@ exports.loginDriver = async (req, res) => {
       "deviceId",
       "deviceType",
       "appVersion",
-      "apiVersion"
+      "apiVersion",
+      "languageCode",
+      "loginRegion"
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
@@ -249,7 +250,9 @@ exports.loginDriver = async (req, res) => {
       deviceId,
       deviceType,
       appVersion,
-      apiVersion
+      apiVersion,
+      languageCode,
+      loginRegion
     } = req.body[constants.APPNAME];
 
     const result = await userMasterModel.findOne({ email: email});
@@ -291,15 +294,10 @@ exports.loginDriver = async (req, res) => {
         index.isLogin = 2;
       }
       await index.save();
-    });
-    
-    // var ip = req.ip.split(':').pop();  
-
-    // console.log(geoip.lookup(ip));
+    });        
 
     const newDeviceLogin = await loginMaster.create({
-      userId: result._id,
-      loginRegion: "",
+      userId: result._id,      
       deviceType,
       deviceId,
       fcmId,
@@ -309,12 +307,13 @@ exports.loginDriver = async (req, res) => {
       deviceName,
       loginTime: new Date(Date.now()).toISOString(),
       isLogin: 1,      
+      languageCode,
+      loginRegion
     });
     let data = await userDetail(result);
     data = {
       ...data,
-      loginId: newDeviceLogin._id,
-      ip: ip,
+      loginId: newDeviceLogin._id,      
       token,
     };
 

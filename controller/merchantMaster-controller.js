@@ -229,7 +229,9 @@ exports.loginMerchant = async (req, res) => {
       "deviceId",
       "deviceType",
       "appVersion",
-      "apiVersion"
+      "apiVersion",
+      "languageCode",
+      "loginRegion"
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
@@ -249,6 +251,8 @@ exports.loginMerchant = async (req, res) => {
       deviceType,
       appVersion,
       apiVersion,
+      languageCode,
+      loginRegion
     } = req.body[constants.APPNAME];
 
     const result = await userMasterModel.findOne({ email });
@@ -300,6 +304,8 @@ exports.loginMerchant = async (req, res) => {
       deviceName,
       loginTime: new Date(Date.now()).toISOString(),
       isLogin: 1,
+      languageCode,
+      loginRegion
     });
     let data = await userDetail(result);
     data = {
