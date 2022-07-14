@@ -4,6 +4,8 @@ const admin = require("../model/admin-model");
 const constants = require("../constants");
 const userMasterModel = require("../model/userMaster-model");
 const categories = require("../model/category-model");
+const mongoose = require('mongoose');
+const productCategoryMasterModel = require("../model/productCategoryMaster-model");
 exports.loginUser = async (req, res) => {
     try {
         console.log(req.body);
@@ -155,4 +157,43 @@ exports.GetAllCategory = async (req, res) => {
             }
         });
     }
+}
+
+exports.approveSubCategory = async (req, res) => {
+  try{    
+        
+    const subCategoryId  = req.body.subCategoryId;            
+    const subCategory = await productCategoryMasterModel.findOne({_id: subCategoryId});
+
+    if(!subCategory){
+      return res.json({
+        [constants.APPNAME]: {
+            success: 0,
+            resMsg: "No sub category found!",
+            data: null,
+        }
+    });
+    }
+
+    subCategory.status = "2";
+    await subCategory.save({validateBeforeSave: false});
+
+    return res.json({
+      [constants.APPNAME]: {
+          success: 1,
+          resMsg: "Sub-Category has been approved.",
+          data: subCategory,
+      }
+  });
+  }
+  catch(err){
+    console.log(err);
+    return res.json({
+      [constants.APPNAME]: {
+          success: 0,
+          resMsg: "Something Went Wrong..." + err,
+          data: null,
+      }
+  });
+  }
 }
