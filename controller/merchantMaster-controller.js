@@ -16,7 +16,7 @@ const coupanModel = require("../model/coupan-model");
 const orderModel = require("../model/order-model");
 const userAddressModel = require("../model/userAddress-model");
 
-const { findByIdAndUpdate } = require("../model/userMaster-model");
+const { findByIdAndUpdate, deleteOne } = require("../model/userMaster-model");
 const genrateOtp = async (userId) => {
   let randomOtp = Math.floor(100000 + Math.random() * 900000);
   const user = await userMasterModel.findOneAndUpdate(
@@ -882,36 +882,124 @@ exports.updateProductCategory = async (req, res) => {
 };
 
 //
-exports.productCategoryMaster = async (req, res) => {
-  try {
+// exports.productCategoryMaster = async (req, res) => {
+//   try {
+//     let checkReqKey = ["name", "categoryId"];
+//     let response = helper.validateJSON(
+//       req.body[constants.APPNAME],
+//       checkReqKey
+//     );
+//     if (response == 0) {
+//       return res.json(helper.generateServerResponse(0, "I"));
+//     }
+//     // const { userId } = req.user;
+//     const { name, categoryId } = req.body[constants.APPNAME];
+//     let payload = {
+//       name,
+//       categoryId,
+//     };
+//     let productCategory = await productCategoryMasterModel.create(payload);
+//     let result = {
+//       id: productCategory._id,
+//       name: productCategory.name,
+//       categoryId: productCategory.categoryId,
+//       status: productCategory.status,
+//       // userId: productCategory.userId,
+//     };
+//     res.json(helper.generateServerResponse(1, "", result));
+//   } catch (error) {
+//     console.log(error);
+//     res.json(helper.generateServerResponse(0, "I"));
+//   }
+// };
+
+exports.addSubCategory = async (req, res) => {
+  try{
+    const {userId } = req.user;
+
     let checkReqKey = ["name", "categoryId"];
-    let response = helper.validateJSON(
-      req.body[constants.APPNAME],
-      checkReqKey
-    );
-    if (response == 0) {
+    
+    let response = helper.validateJSON(req.body[constants.APPNAME], checkReqKey);
+
+    if(response == 0){
       return res.json(helper.generateServerResponse(0, "I"));
     }
-    // const { userId } = req.user;
-    const { name, categoryId } = req.body[constants.APPNAME];
-    let payload = {
+
+    const {name, categoryId} = req.body[constants.APPNAME];
+
+    let subCategory = await productCategoryMasterModel.create({
+      userId,      
       name,
-      categoryId,
-    };
-    let productCategory = await productCategoryMasterModel.create(payload);
-    let result = {
-      id: productCategory._id,
-      name: productCategory.name,
-      categoryId: productCategory.categoryId,
-      status: productCategory.status,
-      // userId: productCategory.userId,
-    };
-    res.json(helper.generateServerResponse(1, "", result));
-  } catch (error) {
-    console.log(error);
-    res.json(helper.generateServerResponse(0, "I"));
+      categoryId
+    });
+
+    return res.json(helper.generateServerResponse(1, "118", subCategory));
   }
-};
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}
+
+exports.editSubCategory = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    if(!userId){
+      return res.json(helper.generateServerResponse(0, "119"));
+    }
+    const { subCategoryId, name, categoryId } = req.body[constants.APPNAME];        
+    const subCategory = await productCategoryMasterModel.findById(subCategoryId);
+
+    if(!subCategory){
+      return res.json(helper.generateServerResponse(0, "168"));
+    }
+
+    if(subCategory.status === "2"){
+      return res.json(helper.generateServerResponse(0, "194"));
+    }    
+
+    let result = await productCategoryMasterModel.findByIdAndUpdate(subCategoryId, {
+      name,
+      categoryId
+    }, {new: true});
+    
+
+    return res.json(helper.generateServerResponse(1, "195", result));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}
+
+exports.deleteSubCategory = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    if(!userId){
+      return res.json(helper.generateServerResponse(0, "119"));
+    }
+    const { subCategoryId } = req.body[constants.APPNAME];    
+    const subCategory = await productCategoryMasterModel.findById(subCategoryId);
+
+    if(!subCategory){
+      return res.json(helper.generateServerResponse(0, "168"));
+    }
+
+    if(subCategory.status === "2"){
+      return res.json(helper.generateServerResponse(0, "194"));
+    }
+
+    await productCategoryMasterModel.deleteOne({ _id: subCategoryId});
+
+    return res.json(helper.generateServerResponse(1, "193"));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}
 
 exports.subProductCategoryList = async (req, res) => {
   try {

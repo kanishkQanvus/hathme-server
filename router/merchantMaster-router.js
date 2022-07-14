@@ -51,12 +51,15 @@ router.route("/OrderHistory").post(auth, merchantController.orderHistory);
 
 
 
-router
-  .route("/ProductCategoryMaster")
-  .post(auth, merchantController.productCategoryMaster);
+// router
+//   .route("/ProductCategoryMaster")
+//   .post(auth, merchantController.productCategoryMaster);
 router
   .route("/PrductCategoryMaster")
   .get(merchantController.subProductCategoryList);
+router.route("/addSubCategory").post(auth, merchantController.addSubCategory);
+router.route("/editSubCategory").patch(auth, merchantController.editSubCategory);
+router.route("/deleteSubCategory").delete(auth, merchantController.deleteSubCategory);
 router.route("/AddProduct").post(auth, merchantController.addProduct);
 router.route("/MyProducts").get(auth, merchantController.myProductList);
 router.route("/DeleteProduct").post(auth, merchantController.deletProducts);

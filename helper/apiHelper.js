@@ -103,6 +103,9 @@ const messages = function (resMsg) {
   codes[190] = "Order is in ready state";
   codes[191] = "Order has been picked up";
   codes[192] = "Order is in preparing stage";
+  codes[193] = "Sub Category has been deleted successfully";
+  codes[194] = "Approved sub-categories cannot be deleted or edited";
+  codes[195] = "Sub Category edited successfully";
 
   return codes[resMsg];
 };

@@ -15,7 +15,7 @@ const ProductCategoryMasterSchema = mongoose.Schema({
     required: true,
   },
   status:{
-    type:String,  // 1. isActive  2. notActive 3.Delete   
+    type:String,  // 1. Not Active  2. active  3.Delete   
     default:1
   },
   createdAt: {
@@ -28,7 +28,7 @@ const ProductCategoryMasterSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("productCategoryMaster", ProductCategoryMasterSchema);
+module.exports = mongoose.model("subCategory", ProductCategoryMasterSchema);
 
 
 
