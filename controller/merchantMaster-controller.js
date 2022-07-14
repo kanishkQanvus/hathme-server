@@ -602,7 +602,7 @@ exports.forgotPin = async (req, res) => {
     }
     res.json(helper.generateServerResponse(1, 111, result));
   } catch (error) {
-    res.json(res.json(helper.generateServerResponse(0, "I")));
+    res.json(helper.generateServerResponse(0, "I"));
   }
 };
 exports.forgotPassword = async (req, res) => {

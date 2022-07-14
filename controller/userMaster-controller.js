@@ -779,10 +779,11 @@ exports.forgotPin = async (req, res) => {
     }
     const email = req.body[constants.APPNAME].email;
     let randomPin = Math.floor(1000 + Math.random() * 9000);
+    let strPin = randomPin.toString();
     const salt = await bcrypt.genSalt(10);
     let pin = await bcrypt.hash(strPin, salt);
     const user = await userMasterModel.findOneAndUpdate(
-      { email: email1 },
+      { email: email },
       { pin: pin },
       { new: true }
     );
@@ -794,7 +795,7 @@ exports.forgotPin = async (req, res) => {
     }
     res.json(helper.generateServerResponse(1, 111, result));
   } catch (error) {
-    res.json(res.json(helper.generateServerResponse(0, "I")));
+    res.json(helper.generateServerResponse(0, "I"));
   }
 };
 
