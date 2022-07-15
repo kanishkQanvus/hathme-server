@@ -105,15 +105,9 @@ exports.newDriver = async (req, res) => {
       "email",
       "password",
       "referralCode",
-      "countryCode",
-      "languageCode",
+      "countryCode",      
       "fcmId",
-      "manufacturer",
-      "deviceName",
-      "deviceId",
-      "appVersion",
-      "apiVersion",
-      "deviceType",      
+      "manufacturer",            
     ];
 
     let response = helper.validateJSON(
@@ -131,15 +125,15 @@ exports.newDriver = async (req, res) => {
       email,
       mobile,
       fcmId,
-      manufacturer,
-      deviceName,
-      countryCode,
-      languageCode,
-      deviceType,
-      deviceId,
-      appVersion,
-      apiVersion,
+      manufacturer,      
+      countryCode,           
     } = req.body[constants.APPNAME];
+
+    const header = req.user;
+
+    if(helper.checkHeader(header) === 0){
+      return res.json(helper.generateServerResponse(0, "196"));
+    }
 
     let referredFrom = null;
     const userAlreadyExistEmail = await userMasterModel.find({ email });
@@ -168,13 +162,13 @@ exports.newDriver = async (req, res) => {
       name,
       email,
       mobile,
-      deviceType,
-      deviceId,
+      deviceType: header.deviceType,
+      deviceId: header.deviceId,
       fcmId,
       manufacturer,
-      appVersion,
-      apiVersion,
-      deviceName,
+      appVersion: header.appVersion,
+      apiVersion: header.apiVersion,
+      deviceName: header.deviceName,
       otp: "123456",
       pin: null,
       referredFrom,
@@ -184,7 +178,7 @@ exports.newDriver = async (req, res) => {
       isActive: 1,
       userType: 3, //1 - User, 2 - Merchant, 3 - driver, 4 - staff
       countryCode,
-      languageCode,
+      languageCode: header.languageCode,
     };
     const result = await userMasterModel(payload);
     await result.save();
@@ -224,14 +218,7 @@ exports.loginDriver = async (req, res) => {
       "email",
       "password",
       "fcmId",
-      "manufacturer",
-      "deviceName",
-      "deviceId",
-      "deviceType",
-      "appVersion",
-      "apiVersion",
-      "languageCode",
-      "loginRegion"
+      "manufacturer",      
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
@@ -245,15 +232,14 @@ exports.loginDriver = async (req, res) => {
       email,
       password,
       fcmId,
-      manufacturer,
-      deviceName,
-      deviceId,
-      deviceType,
-      appVersion,
-      apiVersion,
-      languageCode,
-      loginRegion
+      manufacturer,      
     } = req.body[constants.APPNAME];
+
+    const header = req.user;    
+
+    if(helper.checkHeader(header) === 0){
+      return res.json(helper.generateServerResponse(0, "196"));
+    }
 
     const result = await userMasterModel.findOne({ email: email});
 
@@ -277,7 +263,7 @@ exports.loginDriver = async (req, res) => {
     );
 
     //Logout via DeviceId
-    const deviceData = await loginMaster.find({ deviceId: deviceId });
+    const deviceData = await loginMaster.find({ deviceId: header.deviceId });
     deviceData.forEach(async (index) => {
       if (index.isLogin == 1) {
         index.logoutTime = new Date(Date.now()).toISOString();
@@ -298,17 +284,17 @@ exports.loginDriver = async (req, res) => {
 
     const newDeviceLogin = await loginMaster.create({
       userId: result._id,      
-      deviceType,
-      deviceId,
+      deviceType: header.deviceType,
+      deviceId: header.deviceId,
       fcmId,
       manufacturer,
-      appVersion,
-      apiVersion,
-      deviceName,
+      appVersion: header.appVersion,
+      apiVersion: header.apiVersion,
+      deviceName: header.deviceName,
       loginTime: new Date(Date.now()).toISOString(),
       isLogin: 1,      
-      languageCode,
-      loginRegion
+      languageCode: header.languageCode,
+      loginRegion: header.loginRegion
     });
     let data = await userDetail(result);
     data = {
@@ -391,34 +377,31 @@ exports.otpVerification = async (req, res) => {
     const {
       otp,
       fcmId,
-      manufacturer,
-      deviceName,
-      deviceId,
-      deviceType,
-      appVersion,
-      apiVersion,
+      manufacturer,      
     } = req.body[constants.APPNAME];
 
     const loginTime = new Date(Date.now()).toISOString();
     let checkReqKey = [
       "otp",
       "fcmId",
-      "manufacturer",
-      "deviceName",
-      "deviceId",
-      "deviceType",
-      "appVersion",
-      "apiVersion"
+      "manufacturer",      
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
       checkReqKey
     );
-
+  
     if (response == 0) {
       console.log("hello error");
       return res.json(helper.generateServerResponse(0, "I"));
     }
+
+    const header = req.user;
+
+    if(helper.checkHeader(header) === 0){
+      return res.json(helper.generateServerResponse(0, "196"));
+    }
+
     let data = await userMasterModel.findOne({ _id: userId });
     if (data) {
       if (otp == data.otp) {
@@ -429,15 +412,17 @@ exports.otpVerification = async (req, res) => {
         );
         const userLog = await loginMaster.create({
           userId: data._id,
-          deviceType,
-          deviceId,
+          deviceType: header.deviceType,
+          deviceId: header.deviceId,
           isLogin: 1,
-          appVersion,
-          apiVersion,
+          appVersion: header.appVersion,
+          apiVersion: header.apiVersion,
           loginTime,
           fcmId,
           manufacturer,
-          deviceName,
+          deviceName: header.deviceName,
+          loginRegion: header.loginRegion,
+          languagecode: data.languageCode
         });
 
         let result = await userDetail(user);

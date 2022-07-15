@@ -8,9 +8,9 @@ const {
 const userController = require("../controller/userMaster-controller");
 const merchantController = require("../controller/merchantMaster-controller");
 
-router.route("/Register").post(userController.newUser);
+router.route("/Register").post(setHeader, userController.newUser);
 router.route("/MyProfile").get(auth, userController.myProfile);
-router.route("/Login").post(userController.loginUser);
+router.route("/Login").post(setHeader, userController.loginUser);
 router.post("/OtpVerification", auth, userController.otpVerification);
 router.route("/GeneratePin").post(auth, userController.generatePin);
 router.route("/ChangePassword").post(auth, userController.changePassword);

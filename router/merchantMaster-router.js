@@ -1,15 +1,15 @@
 const express = require("express");
 const merchantController = require("../controller/merchantMaster-controller");
-const { auth } = require("../middleware/auth");
+const { auth, setHeader } = require("../middleware/auth");
 const {
   allCategory,
   searchCategory,
 } = require("../controller/category-controller");
 const router = express.Router();
 
-router.route("/Register").post(merchantController.newMerchant);
+router.route("/Register").post(setHeader, merchantController.newMerchant);
 router.route("/MerchantProfile").get(auth, merchantController.merchantProfile);
-router.route("/Login").post(merchantController.loginMerchant);
+router.route("/Login").post(setHeader, merchantController.loginMerchant);
 router.route("/VerifyPin").post(auth, merchantController.pinVerify);
 router.route("/Logout").post(merchantController.logoutMerchant);
 router.route("/ResendOtp").get(auth, merchantController.resendOtp);

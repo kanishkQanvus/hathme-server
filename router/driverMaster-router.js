@@ -5,9 +5,9 @@ const { auth, setHeader } = require("../middleware/auth");
 
 const driverController = require("../controller/driverMaster-controller");
 
-router.route("/Register").post(driverController.newDriver);
+router.route("/Register").post(setHeader, driverController.newDriver);
 router.route("/MyProfile").get(auth, driverController.myProfile);
-router.route("/Login").post(driverController.loginDriver);
+router.route("/Login").post(setHeader, driverController.loginDriver);
 router.post("/OtpVerification", auth, driverController.otpVerification);
 router.route("/GeneratePin").post(auth, driverController.generatePin);
 router.route("/ChangePassword").post(auth, driverController.changePassword);

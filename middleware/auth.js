@@ -7,7 +7,9 @@ exports.auth = async (req, res, next) => {
   const appVersion = req.header("appVersion"); //Current App Version
   const apiVersion = req.header("apiVersion"); //Current Api Version
   const deviceId = req.header("deviceId"); //App Device Id
-  const language = req.header("language"); //Language Code
+  const deviceName = req.header("deviceName"); //App device name
+  const languageCode = req.header("languageCode"); //Language Code
+  const loginRegion = req.header("loginRegion"); // User Login region
   const userToken = await jwt.verify(token, process.env.JWT_SECRET_KEY);
   try {
     if (!token) {
@@ -21,7 +23,7 @@ exports.auth = async (req, res, next) => {
     //     deviceType,deviceId,version,apiVersion,language
     // }
     let userId = userToken.userId;
-    req.user = {userId,appVersion,deviceType,apiVersion,deviceId,language};
+    req.user = {userId,appVersion,deviceType,apiVersion,deviceId, deviceName,languageCode, loginRegion};
   
     console.log(req.user);
     next();
@@ -35,7 +37,12 @@ exports.setHeader = async(req,res,next)=>{
     const appVersion = req.header("appVersion"); //Current App Version
     const apiVersion = req.header("apiVersion"); //Current Api Version
     const deviceId = req.header("deviceId"); //App Device Id
-    const language = req.header("language"); //Language Code
-    req.user = {deviceType,deviceId,appVersion,apiVersion,language};
+    const deviceName = req.header("deviceName"); // App device name
+    const languageCode = req.header("languageCode"); //Language Code
+    const loginRegion = req.header("loginRegion"); // User Login region
+    req.user = {deviceType,deviceId,deviceName ,appVersion,apiVersion,languageCode, loginRegion};
+
+    console.log(req.user);
+
     next();
 }

@@ -106,9 +106,20 @@ const messages = function (resMsg) {
   codes[193] = "Sub Category has been deleted successfully";
   codes[194] = "Approved sub-categories cannot be deleted or edited";
   codes[195] = "Sub Category edited successfully";
+  codes[196] = "Headers are not set"
 
   return codes[resMsg];
 };
+
+exports.checkHeader = function(header){
+  for(let value in header){    
+    if(header[value] === undefined){      
+      return 0;
+    }
+  }  
+
+  return 1;
+}
 exports.generateServerResponse = function (msgCode, resMsg, data = null) {
   let response;
   if (data != null) {
