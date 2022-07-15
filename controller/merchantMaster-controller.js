@@ -1000,7 +1000,8 @@ exports.subProductCategoryList = async (req, res) => {
         subCategoryId: value._id,
         subCategoryName: value.name,
         categoryId: value.categoryId,
-        categoryName: category.name
+        categoryName: category.name,
+        status: value.status
       };
     }));
     return res.json(helper.generateServerResponse(1, "151", result));
