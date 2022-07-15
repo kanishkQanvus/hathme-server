@@ -1371,6 +1371,7 @@ exports.categoryBasedOnMerchent = async (req, res) => {
 
     await Promise.all(
       merchants.map(async (merchant) => {
+        
         const data = await requestMerchantrDetail(merchant.userId);
 
         if(data){

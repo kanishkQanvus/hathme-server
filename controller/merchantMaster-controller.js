@@ -992,13 +992,17 @@ exports.subProductCategoryList = async (req, res) => {
     let subProductList = await productCategoryMasterModel.find({
       userId: userId
     });
-    let result = subProductList.map((value) => {
+    let result = await Promise.all(
+    subProductList.map(async (value) => {
+      let category = await categoryModel.findById(value.categoryId);
+
       return {
         subCategoryId: value._id,
-        name: value.name,
+        subCategoryName: value.name,
         categoryId: value.categoryId,
+        categoryName: category.name
       };
-    });
+    }));
     return res.json(helper.generateServerResponse(1, "151", result));
 
     // res.json(helper.generateServerResponse(0, "152"));
