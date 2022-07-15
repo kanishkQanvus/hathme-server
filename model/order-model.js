@@ -53,7 +53,7 @@ const orderSchema = mongoose.Schema({
         type: String,
     },
     status: {
-        type: String,   // 1=pending for approval ,2=  accept   ,3=cancel                  
+        type: String,   // 1=pending for approval ,2=  accept   ,3=cancel  , 4 -> picked up, 5 -> delivered                
         default: 1
     },
     createdAt: {
@@ -89,8 +89,7 @@ const orderSchema = mongoose.Schema({
     },
     orderState: {
         type: String,
-        //0-> not accepted  1 -> preparing , 2-> ready  , 3-> picked up, 4 -> delivered
-
+        //0-> not accepted  1 -> preparing , 2-> ready 
     },
     orderStar: {
         type: Number,
@@ -119,6 +118,9 @@ const orderSchema = mongoose.Schema({
       comment: {
         type: String
       }
+    },
+    driverId: {
+      type: mongoose.Schema.Types.ObjectId,      
     }
 
 }, { timestamps: true })

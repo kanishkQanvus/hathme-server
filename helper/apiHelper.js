@@ -61,7 +61,7 @@ const messages = function (resMsg) {
   codes[148] = "your product has been updated successfully";
   codes[149] = "your product has been deleted successfully";
   codes[150] = "No Products";
-  codes[151] = "Your sub product list";
+  codes[151] = "Sub Categories list";
   codes[152] = "Please select your product";
   codes[153] = "your product successylly added";
   codes[154] = "No product images";
@@ -107,6 +107,7 @@ const messages = function (resMsg) {
   codes[194] = "Approved sub-categories cannot be deleted or edited";
   codes[195] = "Sub Category edited successfully";
   codes[196] = "Headers are not set"
+  codes[197] = "Something went wrong!"
 
   return codes[resMsg];
 };

@@ -34,8 +34,9 @@ router.route("/GetBankDetails").get(auth, merchantController.getBankDetails);
 router.route("/OrderList").get(auth, merchantController.orderList);
 router.route("/OrderDetail").post(merchantController.orderDetail);
 /////orderStatus
-router.route("/OrderStatus").post(merchantController.orderStatus)
+// router.route("/OrderStatus").post(merchantController.orderStatus)
 
+router.route("/readyOrder").post(merchantController.readyOrder);
 router.route("/getPreparingOrders").get(auth, merchantController.getPreparingOrders);
 router.route("/getReadyOrders").get(auth, merchantController.getReadyOrders);
 router.route("/getPickedupOrders").get(auth, merchantController.getPickedupOrders);
@@ -55,8 +56,8 @@ router.route("/OrderHistory").post(auth, merchantController.orderHistory);
 //   .route("/ProductCategoryMaster")
 //   .post(auth, merchantController.productCategoryMaster);
 router
-  .route("/PrductCategoryMaster")
-  .get(merchantController.subProductCategoryList);
+  .route("/listSubCategories")
+  .get(auth, merchantController.subProductCategoryList);
 router.route("/addSubCategory").post(auth, merchantController.addSubCategory);
 router.route("/editSubCategory").patch(auth, merchantController.editSubCategory);
 router.route("/deleteSubCategory").delete(auth, merchantController.deleteSubCategory);

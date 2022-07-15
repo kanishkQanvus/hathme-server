@@ -988,13 +988,13 @@ exports.deleteSubCategory = async (req, res) => {
 
 exports.subProductCategoryList = async (req, res) => {
   try {
-    const { categoryId } = req.query;
+    const {userId} = req.user;    
     let subProductList = await productCategoryMasterModel.find({
-      categoryId: categoryId,
+      userId: userId
     });
     let result = subProductList.map((value) => {
       return {
-        productCategoryMasterId: value._id,
+        subCategoryId: value._id,
         name: value.name,
         categoryId: value.categoryId,
       };
@@ -1860,39 +1860,64 @@ exports.orderDetail = async (req, res) => {
   }
 };
 
-exports.orderStatus = async (req, res) => {
-  const { orderState, orderId } = req.body[constants.APPNAME];
+exports.readyOrder = async (req, res) => {
+  const {orderId} = req.body[constants.APPNAME];
 
   let order = await orderModel.findById(orderId);
 
-  if (order.orderState == "4") {
-    return res.json(helper.generateServerResponse(1, "187"));
+  if(!order){
+    return res.json(helper.generateServerResponse(0, "177"));
   }
 
-  if (order.status == "2") {
-    try {
-      let order2 = await orderModel.findByIdAndUpdate(
-        { _id: orderId },
-        { orderState: orderState },
-        { new: true }
-      );
-      if (order2.orderState == "1") {
-        return res.json(helper.generateServerResponse(1, "192", order2));
-      } else if (order2.orderState == "2") {
-        return res.json(helper.generateServerResponse(1, "190", order2));
-      } else if (order2.orderState == "3") {
-        return res.json(helper.generateServerResponse(1, "191", order2));
-      } else if (order2.orderState == "4") {
-        return res.json(helper.generateServerResponse(1, "187", order2));
-      }
-    } catch (err) {
-      console.log(err);
-      return res.json(helper.generateServerResponse(0, "I"));
+  if(order.status === "2"){
+    try{
+      let order2 = await orderModel.findByIdAndUpdate({ _id: orderId}, {orderState: "2"}, {new: true});
+
+      return res.json(helper.generateServerResponse(1, "190", order2));
     }
-  } else {
+    catch(err){
+      console.log(err);
+      return res.json(helper.generateServerResponse(0, "197"));
+    }
+  }
+  else{
     return res.json(helper.generateServerResponse(0, "186"));
   }
-};
+}
+
+// exports.orderStatus = async (req, res) => {
+//   const { orderState, orderId } = req.body[constants.APPNAME];
+
+//   let order = await orderModel.findById(orderId);
+
+//   if (order.orderState == "4") {
+//     return res.json(helper.generateServerResponse(1, "187"));
+//   }
+
+//   if (order.status == "2") {
+//     try {
+//       let order2 = await orderModel.findByIdAndUpdate(
+//         { _id: orderId },
+//         { orderState: orderState },
+//         { new: true }
+//       );
+//       if (order2.orderState == "1") {
+//         return res.json(helper.generateServerResponse(1, "192", order2));
+//       } else if (order2.orderState == "2") {
+//         return res.json(helper.generateServerResponse(1, "190", order2));
+//       } else if (order2.orderState == "3") {
+//         return res.json(helper.generateServerResponse(1, "191", order2));
+//       } else if (order2.orderState == "4") {
+//         return res.json(helper.generateServerResponse(1, "187", order2));
+//       }
+//     } catch (err) {
+//       console.log(err);
+//       return res.json(helper.generateServerResponse(0, "I"));
+//     }
+//   } else {
+//     return res.json(helper.generateServerResponse(0, "186"));
+//   }
+// };
 
 exports.getPreparingOrders = async (req, res) => {
   const { userId } = req.user;
@@ -1966,7 +1991,7 @@ exports.getPickedupOrders = async (req, res) => {
   const { userId } = req.user;
 
   const orders = await orderModel.find({
-    $and: [{ merchantId: userId }, { orderState: 3 }],
+    $and: [{ merchantId: userId }, { status: 4 }],
   });
 
   if (orders.length <= 0) {
@@ -1995,7 +2020,7 @@ exports.getDeliveredOrders = async (req, res) => {
   const { userId } = req.user;
 
   const orders = await orderModel.find({
-    $and: [{ merchantId: userId }, { orderState: 4 }],
+    $and: [{ merchantId: userId }, { status: 5 }],
   });
 
   if (orders.length <= 0) {
