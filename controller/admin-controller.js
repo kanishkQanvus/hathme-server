@@ -159,10 +159,11 @@ exports.GetAllCategory = async (req, res) => {
     }
 }
 
-exports.approveSubCategory = async (req, res) => {
+exports.changeSubCategoryStatus = async (req, res) => {
   try{    
         
-    const subCategoryId  = req.body.subCategoryId;            
+    const subCategoryId  = req.body.subCategoryId;   
+    const status = req.body.status;         
     const subCategory = await productCategoryMasterModel.findOne({_id: subCategoryId});
 
     if(!subCategory){
@@ -175,13 +176,24 @@ exports.approveSubCategory = async (req, res) => {
     });
     }
 
-    subCategory.status = "2";
+    if(subCategory.status === "2")
+    {
+      return res.json({
+        [constants.APPNAME]: {
+          success: 0,
+          resMsg: "Sub Categories has already been approved!",
+          data: null,
+        }
+      })
+    }
+
+    subCategory.status = status;
     await subCategory.save({validateBeforeSave: false});
 
     return res.json({
       [constants.APPNAME]: {
           success: 1,
-          resMsg: "Sub-Category has been approved.",
+          resMsg: "Sub-Category status has been changed.",
           data: subCategory,
       }
   });

@@ -15,7 +15,7 @@ const ProductCategoryMasterSchema = mongoose.Schema({
     required: true,
   },
   status:{
-    type:String,  // 1. Not Active  2. active  3.Delete   
+    type:String,  // 1. Not Active  2. active  3.Reject   
     default:1
   },
   createdAt: {

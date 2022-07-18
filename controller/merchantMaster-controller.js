@@ -975,7 +975,8 @@ exports.editSubCategory = async (req, res) => {
 
     let result = await productCategoryMasterModel.findByIdAndUpdate(subCategoryId, {
       name,
-      categoryId
+      categoryId,
+      status: "1",
     }, {new: true});
     
 
