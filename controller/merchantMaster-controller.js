@@ -898,6 +898,35 @@ exports.updateProductCategory = async (req, res) => {
 //   }
 // };
 
+exports.getAllSubCategories = async(req, res) => {
+  try{
+    const {categoryId} = req.body[constants.APPNAME];
+
+    const subCategories = await productCategoryMasterModel.find({ $and: [
+      {categoryId},
+      {status: "2"}
+    ]})
+
+    if(subCategories.length <= 0){
+      return res.json(helper.generateServerResponse(0, "168"));
+    }
+
+    let result = await Promise.all(
+      subCategories.map(async (value) => {
+        return {
+          subCategoryId: value._id,
+          subCategoryName: value.name
+        }
+      })
+    )
+
+    return res.json(helper.generateServerResponse(1, "151", result));
+  }
+  catch(err){
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}
+
 exports.addSubCategory = async (req, res) => {
   try{
     const {userId } = req.user;

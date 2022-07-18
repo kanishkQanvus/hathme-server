@@ -2,6 +2,7 @@ const loginMaster = require("../model/loginMaster-model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userMasterModel = require("../model/userMaster-model");
+const driverDetails = require("../model/driverDetails");
 const constants = require("../constants");
 const helper = require("../helper/apiHelper");
 const { default: mongoose } = require("mongoose");
@@ -70,6 +71,12 @@ const userDetail = async (data) => {
       : "",
     panCardPicture: data.panCardPicture
       ? process.env.PANCARDPICTURE + `${data.panCardPicture}`
+      : "", 
+      drivingLicenseFront: data.drivingLicenseFront
+      ? process.env.DRIVINGLICENSE + `${data.drivingLicenseFront}`
+      : "",    
+      drivingLicenseBack: data.drivingLicenseBack
+      ? process.env.DRIVINGLICENSE + `${data.drivingLicenseBack}`
       : "",    
     // randNum: data.randNum ? data.randNum : "",
   };
@@ -182,6 +189,11 @@ exports.newDriver = async (req, res) => {
     };
     const result = await userMasterModel(payload);
     await result.save();
+
+    let driverDetail = await driverDetails.create({
+      userId: result._id,
+    });
+
     // let genOtp = await genrateOtp(result._id);
     const token = await jwt.sign(
       { userId: result._id },
@@ -473,7 +485,7 @@ exports.generatePin = async (req, res) => {
     pin = await bcrypt.hash(pin, salt);
     let user = await userMasterModel.findByIdAndUpdate(
       userId,
-      { pin: pin, isProfileCompleted: 1 },
+      { pin: pin },
       { new: true }
     );
     let data = await userDetail(user);
@@ -626,49 +638,90 @@ exports.forgotPin = async (req, res) => {
 exports.userVerification = async (req, res) => {
   try {
     const { userId } = req.user;
-    let checkReqKey = [
-      "fullName",
-      "dateOfBirth",
-      "panCardNumber",
-      "panCardPicture",
-      "aadharCardNumber",
-      "aadharCardFrontPicture",
-      "aadharCardBackPicture",
-    ];
-    let response = helper.validateJSON(
-      req.body[constants.APPNAME],
-      checkReqKey
-    );
+    // let checkReqKey = [      
+    //   "address",
+    //   "dateOfBirth",
+    //   "profileImage",
+    //   "panCardNumber",
+    //   "panCardPicture",
+    //   "drivingLicenseFront",
+    //   "drivingLicenseBack",
+    //   "aadharCardNumber",
+    //   "aadharCardFrontPicture",
+    //   "aadharCardBackPicture",
+    // ];
+    // let response = helper.validateJSON(
+    //   req.body[constants.APPNAME],
+    //   checkReqKey
+    // );
 
-    if (response == 0) {
-      return res.json(helper.generateServerResponse(0, "I"));
-    }
-    const {
-      name,
+    // if (response == 0) {
+    //   console.log("error coming from here");
+    //   return res.json(helper.generateServerResponse(0, "I"));
+    // }    
+
+    const {      
+      address,
       dateOfBirth,
+      profileImage,
       panCardNumber,
       panCardPicture,
+      drivingLicenseFront,
+      drivingLicenseBack,
       aadharCardNumber,
       aadharCardFrontPicture,
       aadharCardBackPicture,
     } = req.body[constants.APPNAME];
-    let data = {
-      name,
+    let data = {            
       dateOfBirth,
       panCardNumber,
       aadharCardNumber,
     };
+
+    
+
+    if(profileImage){      
+      let date = new Date().getTime().toString();
+      let name = userId + "-profile-" + date;
+      let folderPath = "./uploads/profileImages/";
+      const imageName = helper.saveImage(profileImage, name, folderPath);
+      data = {...data, profileImage: imageName};
+    }
+
     if (panCardPicture) {
-      let date = new Date();
-      let name = userId + "pan" + date;
+      let date = new Date().getTime().toString();
+      let name = userId + "-pan-" + date;
       let folderPath = "./uploads/panCardImages/";
       const imageName = helper.saveImage(panCardPicture, name, folderPath);
       data = { ...data, panCardPicture: imageName };
     }
+    if (drivingLicenseFront) {
+      let date = new Date().getTime().toString();
+      let folderPath = "./uploads/drivingLicenseImages/";
+      let name = userId + "-LicenseFront-" + date;
+      const imageName = helper.saveImage(
+        drivingLicenseFront,
+        name,
+        folderPath
+      );
+      data = { ...data, drivingLicenseFront: imageName };
+    }
+    if (drivingLicenseBack) {
+      let date = new Date().getTime().toString();
+      let folderPath = "./uploads/drivingLicenseImages/";
+      let name = userId + "-LicenseBack-" + date;
+      const imageName = helper.saveImage(
+        drivingLicenseBack,
+        name,
+        folderPath
+      );
+      data = { ...data, drivingLicenseBack: imageName };
+    }
+
     if (aadharCardFrontPicture) {
-      let date = new Date();
+      let date = new Date().getTime().toString();
       let folderPath = "./uploads/aadharCardImages/";
-      let name = userId + "adharFront" + date;
+      let name = userId + "-adharFront-" + date;
       const imageName = helper.saveImage(
         aadharCardFrontPicture,
         name,
@@ -677,9 +730,9 @@ exports.userVerification = async (req, res) => {
       data = { ...data, aadharCardFrontPicture: imageName };
     }
     if (aadharCardBackPicture) {
-      let date = new Date();
+      let date = new Date().getTime().toString();
       let folderPath = "./uploads/aadharCardImages/";
-      let name = userId + "adharBack" + date;
+      let name = userId + "-adharBack-" + date;
       const imageName = helper.saveImage(
         aadharCardBackPicture,
         name,
@@ -687,6 +740,9 @@ exports.userVerification = async (req, res) => {
       );
       data = { ...data, aadharCardBackPicture: imageName, folderPath };
     }
+
+    let userAddress = await driverDetails.findOneAndUpdate({userId: userId}, {address: address});
+    
     let updateUser = await userMasterModel.findOneAndUpdate(
       { _id: userId },
       data,
@@ -694,9 +750,11 @@ exports.userVerification = async (req, res) => {
     );
 
     let result = await userDetail(updateUser);
+    result = {...result, address};
 
     res.json(helper.generateServerResponse(1, "S", result));
   } catch (error) {
+    console.log(error);
     res.json(helper.generateServerResponse(0, "I"));
   }
 };

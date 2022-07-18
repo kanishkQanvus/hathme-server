@@ -55,6 +55,9 @@ router.route("/OrderHistory").post(auth, merchantController.orderHistory);
 // router
 //   .route("/ProductCategoryMaster")
 //   .post(auth, merchantController.productCategoryMaster);
+
+router.route("/getAllSubCategories").post(merchantController.getAllSubCategories);
+
 router
   .route("/listSubCategories")
   .get(auth, merchantController.subProductCategoryList);

@@ -222,6 +222,7 @@ exports.saveImage = (encodedUri, name, folderPath) => {
 
     // let ans=buff.toString('base64');
     // console.log(buff, "buf2")
+    console.log(folderPath);
     fs.writeFileSync(`${folderPath}` + fileName, buff);
     console.log("buf3")
 

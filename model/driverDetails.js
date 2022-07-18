@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const merchantSchema = new mongoose.Schema({
+const driverSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Types.ObjectId,
     required: true,
@@ -18,19 +18,15 @@ const merchantSchema = new mongoose.Schema({
   modifiedAt: {
     type: Date,
     default: Date.now(),
-  },
-  categoryId: {
-    type: mongoose.Types.ObjectId,
-  },
+  },  
   address: {
     type: String,
-    // required: true,
-  
+    // required: true,  
   },
-  coverPhoto: { 
+  profilePhoto: { 
     type: String,
     // required: true,
-    default: "01_cover_photo.jpg",
+    default: "01_profile_photo.jpg",
   },
   rating:{
     type:String,
@@ -39,4 +35,4 @@ const merchantSchema = new mongoose.Schema({
   
 });
 
-module.exports = mongoose.model("merchantDetails", merchantSchema);
+module.exports = mongoose.model("driverDetails", driverSchema);

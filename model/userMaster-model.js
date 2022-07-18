@@ -101,7 +101,7 @@ const userSchema = mongoose.Schema({
   profileImage: {
     type: String,
   },
-  dateOfBirth: {
+  dateOfBirth: { // YYYYMMDD
     type: String,
   },
 
@@ -111,6 +111,9 @@ const userSchema = mongoose.Schema({
 
   aadharCardFrontPicture: { type: String },
   aadharCardBackPicture: { type: String },
+
+  drivingLicenseFront: {type: String},
+  drivingLicenseBack: {type: String}
 });
 
 module.exports = mongoose.model("userMaster", userSchema);
