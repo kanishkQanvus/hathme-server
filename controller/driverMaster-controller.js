@@ -3,7 +3,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userMasterModel = require("../model/userMaster-model");
 const driverDetails = require("../model/driverDetails");
+const merchantModel = require("../model/merchantDetails");
 const bankDetails = require("../model/bankDetail-model");
+const userAddressModel = require("../model/userAddress-model");
 const constants = require("../constants");
 const helper = require("../helper/apiHelper");
 const { default: mongoose } = require("mongoose");
@@ -899,6 +901,50 @@ exports.getAcceptedOrders = async (req, res) => {
     )
 
     return res.json(helper.generateServerResponse(1, "S", result));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}
+
+exports.getPendingDeliveries = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    const user = driverDetails.findById(userId);
+
+    if(user.isOnOff === 2){
+      return res.json(helper.generateServerResponse(0, "201"));
+    }
+
+    const orders = await orderModel.find({$and: [
+      {status : "2"},
+      {orderState: "1"},
+      {orderState: "2"},
+      {driverId: {$type: 'undefined'}}
+    ]});
+
+    if(orders.length == 0){
+      return res.json(helper.generateServerResponse(0, "177"));
+    }
+
+    const result = await Promise.all(
+      orders.map(async (order) => {
+        const merchantAddress = await merchantModel.findOne({userId: order.merchantId});
+        const userAddress = await userAddressModel.findById(order.addressId);
+        return {
+          orderId: order._id ? order._id : "",
+          orderNo: order.orderId ? order.orderId : "",
+          pickUp: merchantAddress.address ? merchantAddress.address : "",
+          dropOff: userAddress.fullAddress ? userAddress.fullAddress : "",
+          estFare: order.deliveryFeePerKm ? order.deliveryFeePerKm : "",
+        }
+      })
+    )
+
+    return res.json(helper.generateServerResponse(1, "S", result));
+
   }
   catch(err){
     console.log(err);

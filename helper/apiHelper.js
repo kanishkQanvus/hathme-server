@@ -111,6 +111,7 @@ const messages = function (resMsg) {
   codes[198] = "Your profile is not complete or has not been verified!"
   codes[199] = "This order has already been accepted by another driver!"
   codes[200] = "Driver has accepted the order"
+  codes[201] = "User is offline!"
 
   return codes[resMsg];
 };
