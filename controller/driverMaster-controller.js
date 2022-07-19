@@ -3,12 +3,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userMasterModel = require("../model/userMaster-model");
 const driverDetails = require("../model/driverDetails");
+const bankDetails = require("../model/bankDetail-model");
 const constants = require("../constants");
 const helper = require("../helper/apiHelper");
 const { default: mongoose } = require("mongoose");
 const { find } = require("../model/loginMaster-model");
 // const addTocartModel = require("../")
 const { read } = require("fs");
+const orderModel = require("../model/order-model");
 const genrateOtp = async (userId) => {
   let randomOtp = Math.floor(100000 + Math.random() * 900000);
   const user = await userMasterModel.findOneAndUpdate(
@@ -101,6 +103,21 @@ const shortUserDetail = async (data) => {
   };
   return result;
 };
+
+const orderDetails = async (data) => {
+  if(data.length == 0){
+    return [];
+  }
+
+  let result = {
+    orderId: data._id ? data._id : "",
+    orderNo: data.orderId ? data.orderId : "",
+    products: data.products ? data.products : [],
+    driverId: data.driverId ? data.driverId : "",    
+  }
+  
+  return result;
+}
 
 exports.newDriver = async (req, res) => {
   const APPNAME = constants.APPNAME;
@@ -759,4 +776,132 @@ exports.userVerification = async (req, res) => {
   }
 };
 
+exports.bankDetails = async (req, res) => {  
+  let checkReqKey = [
+    "name",
+    "bankName",
+    "accountNumber",
+    "ifsc",
+    "branch",
+    "accountType",
+  ];
+  let response = helper.validateJSON(req.body[constants.APPNAME], checkReqKey);
+  if (response == 0) {
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+  try {
+    const { userId } = req.user;
+    const result = req.body[constants.APPNAME];
+    const data = await bankDetails.findOne({ userId: userId });
+    if (data) {
+      const bankDetailUpdate = await bankDetails.findOneAndUpdate(
+        { userId: userId },
+        result,
+        { new: true }
+      );
+      return res.json(helper.generateServerResponse(1, 144));
+    }
+    const bank = await bankDetails.create({
+      userId: userId,
+      name: result.name,
+      bankName: result.bankName,
+      accountNumber: result.accountNumber,
+      ifsc: result.ifsc,
+      branch: result.branch,
+      accountType: result.accountType,
+    });
+    res.json(helper.generateServerResponse(1, 142));
+  } catch (error) {
+    res.json(helper.generateServerResponse(0, 105));
+  }
+};
 
+exports.isOnOff = async (req, res) => {
+  let checkReqKey = ["isOnOff"];
+  let response = helper.validateJSON(req.body[constants.APPNAME], checkReqKey);
+  if (response == 0) {
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+  const { userId } = req.user;
+  // console.log("User ID " + userId);
+  const { isOnOff } = req.body[constants.APPNAME];
+
+  try {
+    let user = await driverDetails.findOne({ userId: userId });
+    console.log(user.userId);
+    if (user == null) {
+      return res.json(helper.generateServerResponse(0, 170));
+    }
+
+    let user2 = await userMasterModel.findById(userId);
+
+    if(user2.isProfileCompleted === 0){
+      return res.json(helper.generateServerResponse(0, "198"));
+    }
+
+    const xx = user._id;
+    let driverDetail = await driverDetails.findByIdAndUpdate(xx, {
+      isOnOff: isOnOff,
+    });
+    // console.log(userId);
+    res.json(helper.generateServerResponse(1, 124));
+  } catch (error) {
+    console.log(error);
+    res.json(helper.generateServerResponse(0, "I"));
+  }
+};
+
+exports.acceptOrder = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    const {orderId} = req.body[constants.APPNAME];
+
+    const order = await orderModel.findById(orderId);
+    const user = await userMasterModel.findById(userId);
+
+    if(order.driverId){
+      return res.json(helper.generateServerResponse(0, "199"));
+    }
+  
+    let order2 = await orderModel.findByIdAndUpdate(orderId, {
+      driverId: userId
+    }, {new: true});
+
+    const result = await orderDetails(order2);
+
+    return res.json(helper.generateServerResponse(1, "200", result));
+  }  
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}
+
+exports.getAcceptedOrders = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    const orders = await orderModel.find({$and: [
+      {driverId: userId},
+      {status: {$ne: "3"}},
+      {status: {$ne: "5"}}
+    ]});
+
+    if(orders.length == 0){
+      return res.json(helper.generateServerResponse(0, "177"));
+    }
+
+    const result = await Promise.all(    
+      orders.map(async (order) => {        
+        return orderDetails(order);
+      })
+    )
+
+    return res.json(helper.generateServerResponse(1, "S", result));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+}

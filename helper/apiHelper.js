@@ -108,6 +108,9 @@ const messages = function (resMsg) {
   codes[195] = "Sub Category edited successfully";
   codes[196] = "Headers are not set"
   codes[197] = "Something went wrong!"
+  codes[198] = "Your profile is not complete or has not been verified!"
+  codes[199] = "This order has already been accepted by another driver!"
+  codes[200] = "Driver has accepted the order"
 
   return codes[resMsg];
 };

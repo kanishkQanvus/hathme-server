@@ -15,5 +15,9 @@ router.route("/ChangePin").post(auth, driverController.changePin);
 router.route("/ForgotPassword").post(driverController.forgotPassword);
 router.route("/ForgotPin").post(driverController.forgotPin);
 router.route("/UserVerify").post(auth, driverController.userVerification);
+router.route("/BankDetails").post(auth, driverController.bankDetails);
+router.route("/Status").post(auth, driverController.isOnOff);
+router.route("/acceptOrder").post(auth, driverController.acceptOrder);
+router.route('/getAcceptedOrders').get(auth, driverController.getAcceptedOrders);
 
 module.exports = router;

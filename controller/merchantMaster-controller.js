@@ -1078,26 +1078,26 @@ exports.addProduct = async (req, res) => {
   console.log("add product is calling");
   try {
     const { userId } = req.user;
-    let checkReqKey = [
-      "name",
-      "description",
-      "price",
-      "categoryId",
-      "productCategoryMasterId",
-      "isVeg",
-      "productImageOne",
-      "productImageTwo",
-      "productImageThree",
-    ];
-    let response = helper.validateJSON(
-      req.body[constants.APPNAME],
-      checkReqKey
-    );
-    //console.log(req.body[constants.APPNAME]);
-    // console.log(response, "response");
-    if (response == 0) {
-      return res.json(helper.generateServerResponse(0, "T"));
-    }
+    // let checkReqKey = [
+    //   "name",
+    //   "description",
+    //   "price",
+    //   "categoryId",
+    //   "productCategoryMasterId",
+    //   "isVeg",
+    //   "productImageOne",
+    //   "productImageTwo",
+    //   "productImageThree",
+    // ];
+    // let response = helper.validateJSON(
+    //   req.body[constants.APPNAME],
+    //   checkReqKey
+    // );
+    // //console.log(req.body[constants.APPNAME]);
+    // // console.log(response, "response");
+    // if (response == 0) {
+    //   return res.json(helper.generateServerResponse(0, "T"));
+    // }
     let {
       name,
       description,
