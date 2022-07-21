@@ -85,7 +85,7 @@ const orderSchema = mongoose.Schema({
     },
     paymentStatus: {
         type: Number,
-        default: 1     // 1= payment status
+        default: 1     // 1= COD // 2 - PAID online        
     },
     orderState: {
         type: String,

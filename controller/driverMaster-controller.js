@@ -948,6 +948,48 @@ exports.getPendingDeliveries = async (req, res) => {
   }
   catch(err){
     console.log(err);
-    return res.json(helper.generateServerResponse(0, "I"));
+    return res.json(helper.generateServerResponse(0, "197"));
+  }
+}
+
+exports.orderDetails = async (req, res) => {
+  try{    
+    const {userId} = req.user;
+
+    const orderId = req.params.orderId;    
+
+    const order = await orderModel.findById(orderId);    
+
+    if(order.driverId.toString() != userId){
+      return res.json(helper.generateServerResponse(0, "119"));
+    }
+
+    if(!order){
+      return res.json(helper.generateServerResponse(0, "168"));
+    }
+    
+    const merchantDetails = await merchantModel.findOne({userId: order.merchantId});
+    const merchant = await userMasterModel.findById(order.merchantId);
+    const customer = await userMasterModel.findById(order.userId);
+
+    const result = {
+      orderId: orderId,
+      orderNo: order.orderId ? order.orderId : "",
+      coverPhoto: merchantDetails.coverPhoto ? merchantDetails.coverPhoto : "",
+      merchantName: merchant.name ? merchant.name : "",
+      merchantAddress: merchantDetails.address ? merchantDetails.address : "",
+      merchantLatitude: "",
+      merchantLongitude : "",
+      customerName: customer.name ? customer.name : "",
+      customerContact: customer.mobile ? customer.mobile : "",
+      paymentStatus: order.paymentStatus ? order.paymentStatus : "",
+      eta: "",      
+    }
+
+    return res.json(helper.generateServerResponse(1, "S", result));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "197"));
   }
 }

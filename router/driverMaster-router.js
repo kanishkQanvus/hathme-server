@@ -20,5 +20,6 @@ router.route("/getPendingDeliveries").get(auth, driverController.getPendingDeliv
 router.route("/Status").post(auth, driverController.isOnOff);
 router.route("/acceptOrder").post(auth, driverController.acceptOrder);
 router.route('/getAcceptedOrders').get(auth, driverController.getAcceptedOrders);
+router.route('/orderDetails/:orderId').get(auth, driverController.orderDetails);
 
 module.exports = router;
