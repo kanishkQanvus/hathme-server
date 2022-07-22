@@ -1031,8 +1031,8 @@ exports.orderPickedUp = async (req, res) => {
 
     const merchant = await merchantModel.findById(order.merchantId);
 
-    let mlatitude = "28.695176";
-    let mlongitude = "77.101423";
+    let mlatitude = merchant.latitude;
+    let mlongitude = merchant.longitude;
 
     if(helper.checkDistance(latitude, longitude, mlatitude, mlongitude) > 0.03){ // If driver is not near the pickup location
       return res.json(helper.generateServerResponse(0, "202"));

@@ -51,7 +51,8 @@ async function referalCodeStr() {
   }
   return ans;
 }
-const userDetail = async (data) => {
+const userDetail = async (data) => {  
+
   let result = {
     merchantId: data._id ? data._id : "",
     name: data.name ? data.name : "",
@@ -78,7 +79,8 @@ const userDetail = async (data) => {
       : "",
     panCardPicture: data.panCardPicture
       ? process.env.PANCARDPICTURE + `${data.panCardPicture}`
-      : "",
+      : "",   
+
   };
   return result;
 };
@@ -474,7 +476,7 @@ exports.generatePin = async (req, res) => {
     pin = await bcrypt.hash(pin, salt);
     let user = await userMasterModel.findByIdAndUpdate(
       userId,
-      { pin: pin, isProfileCompleted: 1 },
+      { pin: pin },
       { new: true }
     );
 
@@ -726,8 +728,12 @@ exports.userVerification = async (req, res) => {
   try {
     const { userId } = req.user;
     let checkReqKey = [
-      "fullName",
-      "dateOfBirth",
+      "fullName", 
+      "address",
+      "latitude",
+      "longitude",
+      "yearOfOpening",
+      "GSTIN",
       "panCardNumber",
       "panCardPicture",
       "aadharCardNumber",
@@ -744,30 +750,41 @@ exports.userVerification = async (req, res) => {
     }
     const {
       fullName,
-      dateOfBirth,
+      yearOfOpening,
+      GSTIN,
+      address,
+      latitude,
+      longitude,
       panCardNumber,
       panCardPicture,
       aadharCardNumber,
       aadharCardFrontPicture,
       aadharCardBackPicture,
     } = req.body[constants.APPNAME];
-    let data = {
-      dateOfBirth,
+    let data = {      
       panCardNumber,
       aadharCardNumber,
     };
+
+    let data2 = {
+      yearOfOpening,
+      address,
+      GSTIN,
+      latitude,
+      longitude,
+    }
     if (panCardPicture) {
-      let date = new Date();
-      let name = userId + "pan" + date;
+      let date = new Date().getTime().toString();
+      let name = userId + "-pan-" + date;
       let folderPath = "./uploads/panCardImages/";
 
       const imageName = helper.saveImage(panCardPicture, name, folderPath);
       data = { ...data, panCardPicture: imageName };
     }
     if (aadharCardFrontPicture) {
-      let date = new Date();
+      let date = new Date().getTime().toString();
       let folderPath = "./uploads/aadharCardImages/";
-      let name = userId + "adharFront" + date;
+      let name = userId + "-adharFront-" + date;
       const imageName = helper.saveImage(
         aadharCardFrontPicture,
         name,
@@ -776,9 +793,9 @@ exports.userVerification = async (req, res) => {
       data = { ...data, aadharCardFrontPicture: imageName };
     }
     if (aadharCardBackPicture) {
-      let date = new Date();
+      let date = new Date().getTime().toString();
       let folderPath = "./uploads/aadharCardImages/";
-      let name = userId + "adharBack" + date;
+      let name = userId + "-adharBack-" + date;
       const imageName = helper.saveImage(
         aadharCardBackPicture,
         name,
@@ -791,12 +808,46 @@ exports.userVerification = async (req, res) => {
       data,
       { new: true }
     );
-    let result = await userDetail(updateUser);
 
-    res.json(helper.generateServerResponse(1, 123, result));
+    let updatedUser2 = await merchantModel.findOneAndUpdate({userId: userId}, data2, {new: true});    
+
+    let result = {
+      merchantId: updateUser._id ? updateUser._id : "",
+      name: updateUser.name ? updateUser.name : "",
+      userName: updateUser.userName ? updateUser.userName : "",
+      mobile: updateUser.mobile ? updateUser.mobile : "",
+      userType: updateUser.userType ? updateUser.userType : "",
+      email: updateUser.email ? updateUser.email : "",
+      referralCode: updateUser.referralCode ? updateUser.referralCode : "",      
+      isActive: updateUser.isActive ? updateUser.isActive : "",
+      isMobileVerified: updateUser.isMobileVerified ? updateUser.isMobileVerified : 0,
+      isProfileCompleted: updateUser.isProfileCompleted ? updateUser.isProfileCompleted : 0,
+      countryCode: updateUser.countryCode ? updateUser.countryCode : "",
+      aadharCardNumber: updateUser.aadharCardNumber ? updateUser.aadharCardNumber : "",
+      panCardNumber: updateUser.panCardNumber ? updateUser.panCardNumber : "",
+      profileImage: updateUser.profileImage
+        ? process.env.PROFILEIMAGE + `${updateUser.profileImage}`
+        : "",
+      aadharCardBackPicture: updateUser.aadharCardBackPicture
+        ? process.env.AADHARDCARDPICTURE + `${updateUser.aadharCardBackPicture}`
+        : "",
+      aadharCardFrontPicture: updateUser.aadharCardFrontPicture
+        ? process.env.AADHARDCARDPICTURE + `${updateUser.aadharCardFrontPicture}`
+        : "",
+      panCardPicture: updateUser.panCardPicture
+        ? process.env.PANCARDPICTURE + `${updateUser.panCardPicture}`
+        : "",   
+      yearOfOpening: updatedUser2.yearOfOpening ? updatedUser2.yearOfOpening : "",
+      address: updatedUser2.address ? updatedUser2.address : "",
+      latitude: updatedUser2.latitude ? updatedUser2.latitude : "",
+      longitude: updatedUser2.longitude ? updatedUser2.longitude : "",
+      GSTIN: updatedUser2.GSTIN ? updatedUser2.GSTIN : "",
+    };
+
+    return res.json(helper.generateServerResponse(1, 123, result));
   } catch (error) {
     console.log(error);
-    res.json(helper.generateServerResponse(0, "I"));
+    return res.json(helper.generateServerResponse(0, "I"));
   }
 };
 

@@ -27,6 +27,18 @@ const merchantSchema = new mongoose.Schema({
     // required: true,
   
   },
+  latitude: {
+    type: String,  
+  },
+  longitude: {
+    type: String,
+  },
+  yearOfOpening:{
+    type: String,    
+  },
+  GSTIN: {
+    type: String,    
+  },
   coverPhoto: { 
     type: String,
     // required: true,
