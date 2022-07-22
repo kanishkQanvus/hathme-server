@@ -19,6 +19,7 @@ app.use("/uploads/profileImages", express.static("uploads/profileImages"));
 app.use("/uploads/categoryImages", express.static("uploads/categoryImages"));
 app.use("/uploads/productImages", express.static("uploads/productImages"));
 app.use("/uploads/drivingLicenseImages", express.static("uploads/drivingLicenseImages"));
+app.use("/uploads/qrcode", express.static("uploads/qrcode"));
 
 
 // for Device Info
