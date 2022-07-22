@@ -115,6 +115,9 @@ const userSchema = mongoose.Schema({
   uniqueID: {
     type: String,
   },
+  qrUrl: {
+    type: String,
+  },
 
   panCardNumber: { type: String },
   panCardPicture: { type: String },

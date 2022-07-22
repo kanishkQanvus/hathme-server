@@ -82,6 +82,8 @@ const userDetail = async (data) => {
       ? process.env.PANCARDPICTURE + `${data.panCardPicture}`
       : "",
     uniqueID: data.uniqueID ? data.uniqueID : "",
+    // url: data.url ? process.env.QRURL + `${data.url.substring(1)}` : "",
+    qrUrl: data.qrUrl ? data.qrUrl : "",
   };
   return result;
 };
@@ -297,7 +299,6 @@ exports.newUser = async (req, res) => {
 
     const header = req.user;
 
-
     let referredFrom = null;
     const userAlreadyExistEmail = await userMasterModel.find({ email });
     const userAlreadyExistMobile = await userMasterModel.find({ mobile });
@@ -322,6 +323,8 @@ exports.newUser = async (req, res) => {
     password = await bcrypt.hash(password, salt);
 
     const uniqueID = Math.floor(Math.random() * 9000000000) + 1000000000;
+    const url = `./uploads/qrcode/${new Date().getTime()}.png`;
+    const qrUrl = process.env.QRURL + `${url.substring(1)}`;
 
     let payload = {
       password,
@@ -348,6 +351,7 @@ exports.newUser = async (req, res) => {
       loginRegion: header.loginRegion,
       languageCode: header.languageCode,
       uniqueID,
+      qrUrl,
     };
     const result = await userMasterModel(payload);
     await result.save();
@@ -367,10 +371,7 @@ exports.newUser = async (req, res) => {
     // Saving Image to system
     const generateQR = async (text) => {
       try {
-        await QRCode.toFile(
-          `./uploads/qrcode/${new Date().getTime()}.png`,
-          text
-        );
+        await QRCode.toFile(`${url}`, text);
       } catch (err) {
         console.error(err);
       }
