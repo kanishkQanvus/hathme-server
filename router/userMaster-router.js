@@ -28,6 +28,7 @@ router.route("/UserSearch").post(userController.searchByUser);
 router.route("/UserDetail").get(userController.getUserDetail);
 router.route("/VerifyPin").post(userController.pinVerify);
 router.route("/Search").post(userController.searchUser);
+router.route("/FindUser").post(userController.findUser);
 // for Request api
 
 router.route("/SendFriendRequest").post(userController.sendFriendRequest);

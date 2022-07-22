@@ -2731,3 +2731,71 @@ exports.clearCart = async (req, res) => {
     return res.json(helper.generateServerResponse(0, "I"));
   }
 };
+
+exports.findUser = async (req, res) => {
+  try {
+    const { keyword, type } = req.body[constants.APPNAME];
+    if (type == 2) {
+      const query = { aadharCardNumber: { $regex: keyword, $options: "i" } };
+      let searchData = await userMasterModel.find(query, {
+        email: 1,
+        name: 1,
+        mobile: 1,
+        profileImage: 1,
+      });
+      if (searchData.length <= 0) {
+        return res.json(helper.generateServerResponse(0, 135));
+      }
+      searchData.forEach((value) => {
+        value.profileImage = process.env.PROFILEIMAGE + `${value.profileImage}`;
+      });
+      return res.json(helper.generateServerResponse(1, "S", searchData));
+    } else if (type == 1) {
+      let searchData = await userMasterModel.find(
+        {
+          $or: [
+            { name: { $regex: keyword } },
+            { email: { $regex: keyword } },
+            { userName: { $regex: keyword } },
+          ],
+        },
+        {
+          email: 1,
+          name: 1,
+          mobile: 1,
+          profileImage: 1,
+        }
+      );
+      if (searchData.length <= 0) {
+        return res.json(helper.generateServerResponse(0, 135));
+      }
+      searchData.forEach((value) => {
+        value.profileImage = process.env.PROFILEIMAGE + `${value.profileImage}`;
+      });
+
+      return res.json(helper.generateServerResponse(1, 134, searchData));
+    } else if (type == 3) {
+      let searchData = await userMasterModel.find(
+        {
+          $or: [{ uniqueID: { $regex: keyword } }],
+        },
+        {
+          email: 1,
+          name: 1,
+          mobile: 1,
+          profileImage: 1,
+        }
+      );
+      if (searchData.length <= 0) {
+        return res.json(helper.generateServerResponse(0, 135));
+      }
+      searchData.forEach((value) => {
+        value.profileImage = process.env.PROFILEIMAGE + `${value.profileImage}`;
+      });
+
+      return res.json(helper.generateServerResponse(1, 134, searchData));
+    }
+  } catch (error) {
+    res.json(helper.generateServerResponse(1, 134, searchData));
+  }
+};
