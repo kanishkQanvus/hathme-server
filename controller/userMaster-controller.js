@@ -81,7 +81,7 @@ const userDetail = async (data) => {
     panCardPicture: data.panCardPicture
       ? process.env.PANCARDPICTURE + `${data.panCardPicture}`
       : "",
-    // randNum: data.randNum ? data.randNum : "",
+    uniqueID: data.uniqueID ? data.uniqueID : "",
   };
   return result;
 };
@@ -267,9 +267,11 @@ exports.newUser = async (req, res) => {
       "email",
       "password",
       "referralCode",
-      "countryCode",      
+      "countryCode",
+      "deviceName",
+      "deviceVersion",
       "fcmId",
-      "manufacturer",      
+      "manufacturer",
     ];
 
     let response = helper.validateJSON(
@@ -277,7 +279,7 @@ exports.newUser = async (req, res) => {
       checkReqKey
     );
 
-    if (response == 0) {      
+    if (response == 0) {
       return res.json(helper.generateServerResponse(0, "I"));
     }
     let {
@@ -287,15 +289,14 @@ exports.newUser = async (req, res) => {
       email,
       mobile,
       fcmId,
-      manufacturer,      
+      deviceName,
+      deviceVersion,
+      manufacturer,
       countryCode,
     } = req.body[constants.APPNAME];
 
-    const header = req.user;    
+    const header = req.user;
 
-    if(helper.checkHeader(header) === 0){
-      return res.json(helper.generateServerResponse(0, "196"));
-    }
 
     let referredFrom = null;
     const userAlreadyExistEmail = await userMasterModel.find({ email });
@@ -319,6 +320,9 @@ exports.newUser = async (req, res) => {
     referralCode = await referalCodeStr();
     const salt = await bcrypt.genSalt(10);
     password = await bcrypt.hash(password, salt);
+
+    const uniqueID = Math.floor(Math.random() * 9000000000) + 1000000000;
+
     let payload = {
       password,
       name,
@@ -330,7 +334,8 @@ exports.newUser = async (req, res) => {
       manufacturer,
       appVersion: header.appVersion,
       apiVersion: header.apiVersion,
-      deviceName: header.deviceName,
+      deviceName,
+      deviceVersion,
       otp: "123456",
       pin: null,
       referredFrom,
@@ -340,10 +345,38 @@ exports.newUser = async (req, res) => {
       isActive: 1,
       userType: 1, //1 - User, 2 - Merchant
       countryCode,
+      loginRegion: header.loginRegion,
       languageCode: header.languageCode,
+      uniqueID,
     };
     const result = await userMasterModel(payload);
     await result.save();
+
+    //Creating QR //
+
+    let qrData = {
+      name,
+      email,
+      mobile,
+      referralCode,
+      uniqueID,
+    };
+    console.log(qrData);
+    let stringdata = JSON.stringify(qrData);
+
+    // Saving Image to system
+    const generateQR = async (text) => {
+      try {
+        await QRCode.toFile(
+          `./uploads/qrcode/${new Date().getTime()}.png`,
+          text
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    generateQR(stringdata);
+
     // let genOtp = await genrateOtp(result._id);
     const token = await jwt.sign(
       { userId: result._id },
@@ -359,7 +392,6 @@ exports.newUser = async (req, res) => {
     res.json(helper.generateServerResponse(0, "I"));
   }
 };
-
 /////
 
 exports.myProfile = async (req, res) => {
@@ -380,6 +412,8 @@ exports.loginUser = async (req, res) => {
       "email",
       "password",
       "fcmId",
+      "deviceName",
+      "deviceVersion",
       "manufacturer",      
     ];
     let response = helper.validateJSON(
@@ -394,14 +428,12 @@ exports.loginUser = async (req, res) => {
       email,
       password,
       fcmId,
+      deviceName,
+      deviceVersion,
       manufacturer,     
     } = req.body[constants.APPNAME];
 
     const header = req.user;    
-
-    if(helper.checkHeader(header) === 0){
-      return res.json(helper.generateServerResponse(0, "196"));
-    }
 
     const result = await userMasterModel.findOne({ email: email });
 
@@ -451,7 +483,8 @@ exports.loginUser = async (req, res) => {
       manufacturer,
       appVersion: header.appVersion,
       apiVersion: header.apiVersion,
-      deviceName: header.deviceName,
+      deviceName,
+      deviceVersion,
       loginTime: new Date(Date.now()).toISOString(),
       isLogin: 1,
       languageCode: header.languageCode,
@@ -538,6 +571,8 @@ exports.otpVerification = async (req, res) => {
     const {
       otp,
       fcmId,
+      deviceName,
+      deviceVersion,
       manufacturer,      
     } = req.body[constants.APPNAME];
 
@@ -545,6 +580,8 @@ exports.otpVerification = async (req, res) => {
     let checkReqKey = [
       "otp",
       "fcmId",
+      "deviceName",
+      "deviceVersion",
       "manufacturer",      
     ];
     let response = helper.validateJSON(
@@ -556,11 +593,7 @@ exports.otpVerification = async (req, res) => {
       return res.json(helper.generateServerResponse(0, "I"));
     }
 
-    const header = req.user;
-
-    if(helper.checkHeader(header) === 0){
-      return res.json(helper.generateServerResponse(0, "196"));
-    }
+    const header = req.user;    
 
     let data = await userMasterModel.findOne({ _id: userId });
     if (data) {
@@ -580,7 +613,8 @@ exports.otpVerification = async (req, res) => {
           loginTime,
           fcmId,
           manufacturer,
-          deviceName: header.deviceName,
+          deviceName,
+          deviceVersion,
           loginRegion: header.loginRegion,
           languagecode: data.languageCode
         });

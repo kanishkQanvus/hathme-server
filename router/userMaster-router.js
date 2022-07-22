@@ -9,66 +9,69 @@ const userController = require("../controller/userMaster-controller");
 const merchantController = require("../controller/merchantMaster-controller");
 
 router.route("/Register").post(setHeader, userController.newUser);
-router.route("/MyProfile").get(auth, userController.myProfile);
 router.route("/Login").post(setHeader, userController.loginUser);
 router.post("/OtpVerification", auth, userController.otpVerification);
-router.route("/GeneratePin").post(auth, userController.generatePin);
-router.route("/ChangePassword").post(auth, userController.changePassword);
-router.route("/ChangePin").post(auth, userController.changePin);
+
+router.use(auth);
+
+router.route("/MyProfile").get(userController.myProfile);
+router.route("/GeneratePin").post(userController.generatePin);
+router.route("/ChangePassword").post(userController.changePassword);
+router.route("/ChangePin").post(userController.changePin);
 router.route("/ForgotPassword").post(userController.forgotPassword);
 router.route("/ForgotPin").post(userController.forgotPin);
-router.route("/UpdateProfile").post(auth, userController.updateProfile);
-router.route("/UserVerify").post(auth, userController.userVerification);
-router.route("/Logout").post(auth, userController.logoutUser);
-router.route("/ResendOtp").get(auth, userController.resendOtp);
+router.route("/UpdateProfile").post(userController.updateProfile);
+router.route("/UserVerify").post(userController.userVerification);
+router.route("/Logout").post(userController.logoutUser);
+router.route("/ResendOtp").get(userController.resendOtp);
 router.route("/UserSearch").post(userController.searchByUser);
 router.route("/UserDetail").get(userController.getUserDetail);
-router.route("/VerifyPin").post(auth, userController.pinVerify);
-router.route("/Search").post(auth, userController.searchUser);
+router.route("/VerifyPin").post(userController.pinVerify);
+router.route("/Search").post(userController.searchUser);
 // for Request api
 
-router.route("/SendFriendRequest").post(auth, userController.sendFriendRequest);
+router.route("/SendFriendRequest").post(userController.sendFriendRequest);
 router
   .route("/PendingRequestList")
-  .get(auth, userController.pendingRequestList);
+  .get(userController.pendingRequestList);
 router.route("/RejectRequest").delete(userController.rejectRequestList);
 router.route("/AcceptFriendRequest").put(userController.acceptRequest);
-router.route("/MyFriends").get(auth, userController.friendRequestList);
-router.route("/AddToCart").post(auth, userController.addToCart);
+router.route("/MyFriends").get(userController.friendRequestList);
+router.route("/AddToCart").post(userController.addToCart);
 router
   .route("/GetProductFromCart")
-  .get(auth, userController.getProductFromCart);
-router.route("/Address").post(auth, userController.address);
-router.route("/UpdateAddress").put(auth, userController.updateAdress);
+  .get(userController.getProductFromCart);
+router.route("/Address").post(userController.address);
+router.route("/UpdateAddress").put(userController.updateAdress);
 
-router.route("/GetAddress").get(auth, userController.getAddress);
+router.route("/GetAddress").get(userController.getAddress);
 
 router.route("/DeleteAddress").delete(userController.deleteAdress);
 //
 router.route("/GetCoupon").get(userController.getCoupon);
 //
-router.route("/ApplyCoupon").post(auth, userController.getCoupenApplied);
-router.route("/RemoveProductsFromCart").get(auth,userController.removeItemFromAddToCart);
-router.route("/RemoveCoupon").get(auth, userController.removeCoupen);
-router.route("/PlaceOrder").post(auth, userController.placeOrder);
-router.route("/OrderList").get(auth, userController.orderList);
+router.route("/ApplyCoupon").post(userController.getCoupenApplied);
+router.route("/RemoveProductsFromCart").get(userController.removeItemFromAddToCart);
+router.route("/RemoveCoupon").get(userController.removeCoupen);
+router.route("/PlaceOrder").post(userController.placeOrder);
+router.route("/OrderList").get(userController.orderList);
 router.route("/OrderDetail").post(userController.orderDetail);
 router.route("/CancelOrder").post(userController.cancelOrder);
-router.route("/repeatOrder").post(auth, userController.repeatOrder);
-router.route("/clearCart").get(auth, userController.clearCart);
+router.route("/repeatOrder").post(userController.repeatOrder);
+router.route("/clearCart").get(userController.clearCart);
 
 //merchant api
 router.route("/ProductList").post(merchantController.productList);
 
 router
   .route("/ProductListByMerchantId")
-  .post(auth, userController.productListByMerchantId);
+  .post(userController.productListByMerchantId);
 router
   .route("/MerchantListByCategoryId")
   .post(userController.categoryBasedOnMerchent);
 router
   .route("/ProductDetailedById")
-  .post(auth, merchantController.productDetailById);
+  .post(merchantController.productDetailById);
 
 // category api
 router.route("/Category").get(allCategory);

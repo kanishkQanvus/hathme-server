@@ -112,6 +112,9 @@ const userSchema = mongoose.Schema({
   dateOfBirth: { // YYYYMMDD
     type: String,
   },
+  uniqueID: {
+    type: String,
+  },
 
   panCardNumber: { type: String },
   panCardPicture: { type: String },
