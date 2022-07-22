@@ -21,5 +21,7 @@ router.route("/Status").post(auth, driverController.isOnOff);
 router.route("/acceptOrder").post(auth, driverController.acceptOrder);
 router.route('/getAcceptedOrders').get(auth, driverController.getAcceptedOrders);
 router.route('/orderDetails/:orderId').get(auth, driverController.orderDetails);
+router.route('/orderPickedUp').post(auth, driverController.orderPickedUp);
+router.route('/orderDelivered').post(auth, driverController.orderDelivered);
 
 module.exports = router;

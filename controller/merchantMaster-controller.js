@@ -1958,7 +1958,7 @@ exports.getPreparingOrders = async (req, res) => {
   const { userId } = req.user;
 
   const orders = await orderModel.find({
-    $and: [{ merchantId: userId }, { orderState: 1 }],
+    $and: [{ merchantId: userId }, { orderState: "1" }],
   });
 
   if (orders.length <= 0) {
@@ -1996,7 +1996,7 @@ exports.getReadyOrders = async (req, res) => {
   const { userId } = req.user;
 
   const orders = await orderModel.find({
-    $and: [{ merchantId: userId }, { orderState: 2 }],
+    $and: [{ merchantId: userId }, { orderState: "2" }],
   });
 
   if (orders.length <= 0) {
@@ -2026,7 +2026,7 @@ exports.getPickedupOrders = async (req, res) => {
   const { userId } = req.user;
 
   const orders = await orderModel.find({
-    $and: [{ merchantId: userId }, { status: 4 }],
+    $and: [{ merchantId: userId }, { status: "4" }],
   });
 
   if (orders.length <= 0) {
@@ -2055,7 +2055,7 @@ exports.getDeliveredOrders = async (req, res) => {
   const { userId } = req.user;
 
   const orders = await orderModel.find({
-    $and: [{ merchantId: userId }, { status: 5 }],
+    $and: [{ merchantId: userId }, { status: "5" }],
   });
 
   if (orders.length <= 0) {

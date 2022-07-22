@@ -960,14 +960,14 @@ exports.orderDetails = async (req, res) => {
 
     const order = await orderModel.findById(orderId);    
 
-    if(order.driverId.toString() != userId){
-      return res.json(helper.generateServerResponse(0, "119"));
-    }
-
     if(!order){
       return res.json(helper.generateServerResponse(0, "168"));
     }
     
+    if(order.driverId.toString() != userId){
+      return res.json(helper.generateServerResponse(0, "119"));
+    }
+
     const merchantDetails = await merchantModel.findOne({userId: order.merchantId});
     const merchant = await userMasterModel.findById(order.merchantId);
     const customer = await userMasterModel.findById(order.userId);
@@ -982,11 +982,89 @@ exports.orderDetails = async (req, res) => {
       merchantLongitude : "",
       customerName: customer.name ? customer.name : "",
       customerContact: customer.mobile ? customer.mobile : "",
-      paymentStatus: order.paymentStatus ? order.paymentStatus : "",
-      eta: "",      
+      paymentStatus: order.paymentStatus ? order.paymentStatus : "",      
     }
 
     return res.json(helper.generateServerResponse(1, "S", result));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "197"));
+  }
+}
+
+exports.orderPickedUp = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    const checkReqKey = [
+      "orderId",
+      "latitude",
+      "longitude"
+    ];
+
+    let response = helper.validateJSON(req.body[constants.APPNAME], checkReqKey);
+
+    if(response == 0){
+      return res.json(helper.generateServerResponse(0, "I"));
+    }
+
+    const {
+      orderId,
+      latitude,
+      longitude,
+    } = req.body[constants.APPNAME];
+        
+    const order = await orderModel.findById(orderId);    
+    
+    if(!order){
+      return res.json(helper.generateServerResponse(0, "168"));
+    }
+
+    if(order.driverId.toString() != userId){
+      return res.json(helper.generateServerResponse(0, "119"));
+    }
+
+    const merchant = await merchantModel.findById(order.merchantId);
+
+    let mlatitude = "28.695176";
+    let mlongitude = "77.101423";
+
+    if(helper.checkDistance(latitude, longitude, mlatitude, mlongitude) > 0.03){ // If driver is not near the pickup location
+      return res.json(helper.generateServerResponse(0, "202"));
+    }    
+
+    order.status = "4";
+    order.save({validateBeforeSave: false});
+
+    return res.json(helper.generateServerResponse(1, "191", order));
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "197"));
+  }
+}
+
+exports.orderDelivered = async (req, res) => {
+  try{
+    const {userId} = req.user;
+
+    const {orderId} = req.body[constants.APPNAME];
+
+    const order = await orderModel.findById(orderId);    
+    
+    if(!order){
+      return res.json(helper.generateServerResponse(0, "168"));
+    }
+
+    if(order.driverId.toString() != userId){
+      return res.json(helper.generateServerResponse(0, "119"));
+    }
+
+    order.status = "5";
+    order.save({validateBeforeSave: false});
+
+    return res.json(helper.generateServerResponse(1, "187", order));
   }
   catch(err){
     console.log(err);

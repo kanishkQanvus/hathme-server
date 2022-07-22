@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 // const fileUpload = require("express-fileupload")
 //
 const mime = require("mime");
@@ -11,7 +11,7 @@ const messages = function (resMsg) {
   codes["F"] = "Data not found";
   codes["S"] = "Success";
   /// for testing
-  codes["T"] = "image part invalid response is zero"
+  codes["T"] = "image part invalid response is zero";
 
   codes[100] = "Email Id can not be empty";
   codes[101] = "Your Email is invalid";
@@ -70,33 +70,33 @@ const messages = function (resMsg) {
   codes[157] = "Product not found";
   codes[158] = "Refferal Code is invalid";
   codes[159] = "No friend";
-  codes[160] = "Product List"
-  codes[161] = "Successfully add product"
-  codes[162] = "Your product has been updated successfully"
-  codes[163] = "Your product add to cart has been successfully"
-  codes[164] = "Your product has been successfully updated in cart"
-  codes[165] = "your product has been removed in cart"
-  codes[166] = "you are not marchant"
-  codes[167] = "you are not user"
-  codes[168] = "No Record Found"
-  codes[169] = "you have been already fill address"
-  codes[170] = "No user Found"
-  codes[171] = "Your address has beed deleted successfully"
-  codes[172] = "No product in cart"
-  codes[173] = "code coupon has been removed"
-  codes[174] = "No Product in cart"
-  codes[175] = "Coupon code is invalid"
-  codes[176] = "Coupon Expire"
-  codes[177] = "No order "
-  codes[178] = "you are not eligible for coupon"
-  codes[179] = "order cancel"
-  codes[180] = "you have already added product from different merchant"
-  codes[181] = "This product does not exist in cart"
-  codes[182] = "Product remove has been successfully from cart"
+  codes[160] = "Product List";
+  codes[161] = "Successfully add product";
+  codes[162] = "Your product has been updated successfully";
+  codes[163] = "Your product add to cart has been successfully";
+  codes[164] = "Your product has been successfully updated in cart";
+  codes[165] = "your product has been removed in cart";
+  codes[166] = "you are not marchant";
+  codes[167] = "you are not user";
+  codes[168] = "No Record Found";
+  codes[169] = "you have been already fill address";
+  codes[170] = "No user Found";
+  codes[171] = "Your address has beed deleted successfully";
+  codes[172] = "No product in cart";
+  codes[173] = "code coupon has been removed";
+  codes[174] = "No Product in cart";
+  codes[175] = "Coupon code is invalid";
+  codes[176] = "Coupon Expire";
+  codes[177] = "No order ";
+  codes[178] = "you are not eligible for coupon";
+  codes[179] = "order cancel";
+  codes[180] = "you have already added product from different merchant";
+  codes[181] = "This product does not exist in cart";
+  codes[182] = "Product remove has been successfully from cart";
   codes[183] = "Merchant Detail not found";
   codes[184] = "Order has been accepted";
   codes[185] = "Order has been cancel";
-  codes[186] = "Order is not accepted";  
+  codes[186] = "Order is not accepted";
   codes[187] = "Order is delivered";
   codes[188] = "Rating has not done";
   codes[189] = "No Order in cart";
@@ -106,25 +106,26 @@ const messages = function (resMsg) {
   codes[193] = "Sub Category has been deleted successfully";
   codes[194] = "Approved sub-categories cannot be deleted or edited";
   codes[195] = "Sub Category edited successfully";
-  codes[196] = "Headers are not set"
-  codes[197] = "Something went wrong!"
-  codes[198] = "Your profile is not complete or has not been verified!"
-  codes[199] = "This order has already been accepted by another driver!"
-  codes[200] = "Driver has accepted the order"
-  codes[201] = "User is offline!"
+  codes[196] = "Headers are not set";
+  codes[197] = "Something went wrong!";
+  codes[198] = "Your profile is not complete or has not been verified!";
+  codes[199] = "This order has already been accepted by another driver!";
+  codes[200] = "Driver has accepted the order";
+  codes[201] = "User is offline!";
+  codes[202] = "Please reach near the pickup location to verify order!";
 
   return codes[resMsg];
 };
 
-exports.checkHeader = function(header){
-  for(let value in header){    
-    if(header[value] === undefined){      
+exports.checkHeader = function (header) {
+  for (let value in header) {
+    if (header[value] === undefined) {
       return 0;
     }
-  }  
+  }
 
   return 1;
-}
+};
 exports.generateServerResponse = function (msgCode, resMsg, data = null) {
   let response;
   if (data != null) {
@@ -160,32 +161,28 @@ exports.validateJSON = (reqJSON, reqKey) => {
 };
 //var data = 'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAA..kJggg==';
 exports.saveImage = (encodedUri, name, folderPath) => {
-
-  encodedUri="data:image/jpeg;base64,"+encodedUri;
-   const matches = encodedUri.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  encodedUri = "data:image/jpeg;base64," + encodedUri;
+  const matches = encodedUri.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
   // matches = encodedUri;
 
   // console.log(encodedUri, "before");
   // encodedUri = String(encodedUri)
   //console.log(encodedUri);
 
-
   //  var matches = encodedUri.match(/^data:([A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
   // var matches = encodedUri.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
   // var response = {};
-
 
   //   if (matches.length !== 3) {
   //     return new Error('Invalid input string');
   // }
 
- // var matches = encodedUri.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
+  // var matches = encodedUri.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
   //var response = {};
 
-  console.log("api 1")
+  console.log("api 1");
   //console.log(matches)
-    let extension = mime.getExtension(matches[1]);
-
+  let extension = mime.getExtension(matches[1]);
 
   // let extension = encodedUri.charAt(0);
   // if (extension == '/') {
@@ -204,32 +201,30 @@ exports.saveImage = (encodedUri, name, folderPath) => {
   //   extension = "jpeg";
   // }
 
-
   //  let ext = mime.getExtension(contentType);
   // ext = (ext && ext.charAt(0) !== '.') ? `.${ext}` : ext;
 
   //  let extension= encodedUri.split(';')[0].split('/');
   //   mime.getExtension(matches[1],'text/plain');
-  console.log("api 2")
+  console.log("api 2");
   // console.log(extension)
   let fileName = name + "." + extension;
-  console.log("api 3")
+  console.log("api 3");
   // console.log(fileName)
 
   //  console.log(`${folderPath}` + fileName, " File Name");
   try {
-    console.log("buf1")
-    let data = String(matches[2])
+    console.log("buf1");
+    let data = String(matches[2]);
 
-    let buff = new Buffer.from(data, 'base64');
+    let buff = new Buffer.from(data, "base64");
     // let buff = new Buffer.from(data);
 
     // let ans=buff.toString('base64');
     // console.log(buff, "buf2")
     console.log(folderPath);
     fs.writeFileSync(`${folderPath}` + fileName, buff);
-    console.log("buf3")
-
+    console.log("buf3");
 
     // fs.writeFileSync(
     //   `${folderPath}` + fileName,
@@ -242,9 +237,6 @@ exports.saveImage = (encodedUri, name, folderPath) => {
     console.log(e);
   }
 };
-
-
-
 
 exports.getRandomFileName = () => {
   var timestamp = new Date().toISOString().replace(/[-:.]/g, "");
@@ -252,63 +244,55 @@ exports.getRandomFileName = () => {
   console.log(random);
   var random_number = timestamp + random;
   return random_number;
-}
+};
 
 // save img
 exports.saveImage2 = (encodedUri, name, folderPath) => {
-
-
-
-
-  var matches = encodedUri.match(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
+  var matches = encodedUri.match(
+    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
+  );
   var response = {};
 
-  console.log("api 1")
+  console.log("api 1");
   //console.log(matches)
   //  let extension = mime.getExtension(matches[1]);
 
   let extension = encodedUri.charAt(0);
-  if (extension == '/') {
+  if (extension == "/") {
     extension = "jpg";
-  }
-  else if (extension == 'i') {
+  } else if (extension == "i") {
     extension = "png";
-  }
-  else if (extension == 'R') {
+  } else if (extension == "R") {
     extension = "gif";
-  }
-  else if (extension == 'U') {
+  } else if (extension == "U") {
     extension = "webp";
-  }
-  else {
+  } else {
     extension = "jpeg";
   }
-
 
   //  let ext = mime.getExtension(contentType);
   // ext = (ext && ext.charAt(0) !== '.') ? `.${ext}` : ext;
 
   //  let extension= encodedUri.split(';')[0].split('/');
   //   mime.getExtension(matches[1],'text/plain');
-  console.log("api 2")
+  console.log("api 2");
   // console.log(extension)
   let fileName = name + "." + extension;
-  console.log("api 3")
+  console.log("api 3");
   // console.log(fileName)
 
   //  console.log(`${folderPath}` + fileName, " File Name");
   try {
-    console.log("buf1")
-    let data = String(matches[2])
+    console.log("buf1");
+    let data = String(matches[2]);
 
-    let buff = new Buffer.from(data, 'base64');
+    let buff = new Buffer.from(data, "base64");
     // let buff = new Buffer.from(data);
 
     // let ans=buff.toString('base64');
     // console.log(buff, "buf2")
     fs.writeFileSync(`${folderPath}` + fileName, buff);
-    console.log("buf3")
-
+    console.log("buf3");
 
     // fs.writeFileSync(
     //   `${folderPath}` + fileName,
@@ -321,3 +305,29 @@ exports.saveImage2 = (encodedUri, name, folderPath) => {
     console.log(e);
   }
 };
+
+function toRad(Value) {
+  return (Value * Math.PI) / 180;
+}
+
+exports.checkDistance = (lat1, lon1, lat2, lon2) => {
+  var R = 6371; // km
+  var dLat = toRad(lat2 - lat1);
+  var dLon = toRad(lon2 - lon1);
+  var lat1 = toRad(lat1);
+  var lat2 = toRad(lat2);
+
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c;
+  
+  d = d.toFixed(3);
+
+  console.log(d);
+
+  return d;
+};
+
+
