@@ -91,6 +91,8 @@ exports.newMerchant = async (req, res) => {
       "email",
       "mobile",
       "fcmId",
+      "deviceName",
+      "deviceVersion",
       "manufacturer",      
       "countryCode",      
     ];
@@ -110,6 +112,8 @@ exports.newMerchant = async (req, res) => {
       email,
       mobile,
       fcmId,
+      deviceName,
+      deviceVersion,
       manufacturer,      
       countryCode,      
     } = req.body[constants.APPNAME];
@@ -117,9 +121,7 @@ exports.newMerchant = async (req, res) => {
 
     const header = req.user;
 
-    if(helper.checkHeader(header) === 0){
-      return res.json(helper.generateServerResponse(0, "196"));
-    }
+    
 
     const salt = await bcrypt.genSalt(10);
     password = await bcrypt.hash(password, salt);
@@ -157,7 +159,8 @@ exports.newMerchant = async (req, res) => {
       manufacturer,
       appVersion: header.appVersion,
       apiVersion: header.apiVersion,
-      deviceName: header.deviceName,
+      deviceName,
+      deviceVersion,
       otp: "123456",
       pin: null,
       referredFrom,
@@ -168,6 +171,7 @@ exports.newMerchant = async (req, res) => {
       isActive: 1,
       userType: 2,
       countryCode,
+      loginRegion: header.loginRegion,
       languageCode: header.languageCode
     };
     const result = await userMasterModel.create(payload);
@@ -220,6 +224,8 @@ exports.loginMerchant = async (req, res) => {
       "email",
       "password",
       "fcmId",
+      "deviceName",
+      "deviceVersion",
       "manufacturer",      
     ];
     let response = helper.validateJSON(
@@ -234,14 +240,12 @@ exports.loginMerchant = async (req, res) => {
       email,
       password,
       fcmId,
+      deviceName,
+      deviceVersion,
       manufacturer,      
     } = req.body[constants.APPNAME];
 
-    const header = req.user;    
-
-    if(helper.checkHeader(header) === 0){
-      return res.json(helper.generateServerResponse(0, "196"));
-    }
+    const header = req.user;        
 
     const result = await userMasterModel.findOne({ email });
 
@@ -288,7 +292,8 @@ exports.loginMerchant = async (req, res) => {
       manufacturer,
       appVersion: header.appVersion,
       apiVersion: header.apiVersion,
-      deviceName: header.deviceName,
+      deviceName,
+      deviceVersion,
       loginTime: new Date(Date.now()).toISOString(),
       isLogin: 1,
       languageCode: header.languageCode,
@@ -388,12 +393,16 @@ exports.otpVerification = async (req, res) => {
   const {
     otp,
     fcmId,
+    deviceName,
+    deviceVersion,
     manufacturer,    
   } = req.body[constants.APPNAME];
   try {
     let checkReqKey = [
       "otp",
       "fcmId",
+      "deviceName",
+      "deviceVersion",
       "manufacturer",      
     ];
     let response = helper.validateJSON(
@@ -405,11 +414,7 @@ exports.otpVerification = async (req, res) => {
       return res.json(helper.generateServerResponse(0, "I"));
     }
 
-    const header = req.user;
-
-    if(helper.checkHeader(header) === 0){
-      return res.json(helper.generateServerResponse(0, "196"));
-    }
+    const header = req.user;    
 
     let data = await userMasterModel.findById(userId);
     console.log(data);
@@ -431,7 +436,8 @@ exports.otpVerification = async (req, res) => {
         loginTime,
         fcmId,
         manufacturer,
-        deviceName: header.deviceName,
+        deviceName,
+        deviceVersion,
         loginRegion: header.loginRegion,
         languagecode: data.languageCode
       });

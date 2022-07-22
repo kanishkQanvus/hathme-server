@@ -8,46 +8,49 @@ const {
 const router = express.Router();
 
 router.route("/Register").post(setHeader, merchantController.newMerchant);
-router.route("/MerchantProfile").get(auth, merchantController.merchantProfile);
 router.route("/Login").post(setHeader, merchantController.loginMerchant);
-router.route("/VerifyPin").post(auth, merchantController.pinVerify);
-router.route("/Logout").post(merchantController.logoutMerchant);
-router.route("/ResendOtp").get(auth, merchantController.resendOtp);
 router.route("/OtpVerification").post(auth, merchantController.otpVerification);
-router.route("/MerchantDetail").post(auth, merchantController.merchnatDetail);
+
+router.use(auth);
+
+router.route("/MerchantProfile").get(merchantController.merchantProfile);
+router.route("/VerifyPin").post(merchantController.pinVerify);
+router.route("/Logout").post(merchantController.logoutMerchant);
+router.route("/ResendOtp").get(merchantController.resendOtp);
+router.route("/MerchantDetail").post(merchantController.merchnatDetail);
 router
   .route("/updateCategory")
-  .post(auth, merchantController.updateProductCategory);
+  .post(merchantController.updateProductCategory);
 
-router.route("/GeneratePin").post(auth, merchantController.generatePin);
-router.route("/ChangePassword").post(auth, merchantController.changePassword);
-router.route("/ChangePin").post(auth, merchantController.changePin);
+router.route("/GeneratePin").post(merchantController.generatePin);
+router.route("/ChangePassword").post(merchantController.changePassword);
+router.route("/ChangePin").post(merchantController.changePin);
 router.route("/ForgotPin").post(merchantController.forgotPin);
 router.route("/ForgotPassword").post(merchantController.forgotPassword);
 
-router.route("/Status").post(auth, merchantController.isOnOff);
-router.route("/UpdateProfile").post(auth, merchantController.updateProfile);
-router.route("/UserVerify").post(auth, merchantController.userVerification);
-router.route("/BankDetails").post(auth, merchantController.bankDetails);
-router.route("/GetBankDetails").get(auth, merchantController.getBankDetails);
+router.route("/Status").post(merchantController.isOnOff);
+router.route("/UpdateProfile").post(merchantController.updateProfile);
+router.route("/UserVerify").post(merchantController.userVerification);
+router.route("/BankDetails").post(merchantController.bankDetails);
+router.route("/GetBankDetails").get(merchantController.getBankDetails);
 ///////
-router.route("/OrderList").get(auth, merchantController.orderList);
+router.route("/OrderList").get(merchantController.orderList);
 router.route("/OrderDetail").post(merchantController.orderDetail);
 /////orderStatus
 // router.route("/OrderStatus").post(merchantController.orderStatus)
 
 router.route("/readyOrder").post(merchantController.readyOrder);
-router.route("/getPreparingOrders").get(auth, merchantController.getPreparingOrders);
-router.route("/getReadyOrders").get(auth, merchantController.getReadyOrders);
-router.route("/getPickedupOrders").get(auth, merchantController.getPickedupOrders);
-router.route("/getDeliveredOrders").get(auth, merchantController.getDeliveredOrders);
+router.route("/getPreparingOrders").get(merchantController.getPreparingOrders);
+router.route("/getReadyOrders").get(merchantController.getReadyOrders);
+router.route("/getPickedupOrders").get(merchantController.getPickedupOrders);
+router.route("/getDeliveredOrders").get(merchantController.getDeliveredOrders);
 
 
 
 
 
-router.route("/OrderRating").post(auth, merchantController.orderRating)
-router.route("/OrderHistory").post(auth, merchantController.orderHistory);
+router.route("/OrderRating").post(merchantController.orderRating)
+router.route("/OrderHistory").post(merchantController.orderHistory);
 
 
 
@@ -60,17 +63,17 @@ router.route("/getAllSubCategories").post(merchantController.getAllSubCategories
 
 router
   .route("/listSubCategories")
-  .get(auth, merchantController.subProductCategoryList);
-router.route("/addSubCategory").post(auth, merchantController.addSubCategory);
-router.route("/editSubCategory").patch(auth, merchantController.editSubCategory);
-router.route("/deleteSubCategory").delete(auth, merchantController.deleteSubCategory);
-router.route("/AddProduct").post(auth, merchantController.addProduct);
-router.route("/MyProducts").get(auth, merchantController.myProductList);
-router.route("/DeleteProduct").post(auth, merchantController.deletProducts);
+  .get(merchantController.subProductCategoryList);
+router.route("/addSubCategory").post(merchantController.addSubCategory);
+router.route("/editSubCategory").patch(merchantController.editSubCategory);
+router.route("/deleteSubCategory").delete(merchantController.deleteSubCategory);
+router.route("/AddProduct").post(merchantController.addProduct);
+router.route("/MyProducts").get(merchantController.myProductList);
+router.route("/DeleteProduct").post(merchantController.deletProducts);
 router.route("/UpdateProduct").put(merchantController.editProduct);
 router
   .route("/ProductCategoryList")
-  .get(auth, merchantController.subProductCategoryList);
+  .get(merchantController.subProductCategoryList);
 router.route("/AddProductImages").post(merchantController.addProductImage);
 router.route("/DeleteProductImage").post(merchantController.deleteProductImage);
 // router
@@ -78,17 +81,17 @@ router.route("/DeleteProductImage").post(merchantController.deleteProductImage);
 //   .post(merchantController.merchantListByCategory);
 router
   .route("/MerchantDetailedById")
-  .get(auth, merchantController.merchantDetailById);
+  .get(merchantController.merchantDetailById);
 router
   .route("/ProductListByMerchant")
-  .get(auth, merchantController.proudctListByMerchant);
+  .get(merchantController.proudctListByMerchant);
 router
   .route("/ProductDetailedById")
-  .post(auth, merchantController.productDetailById);
+  .post(merchantController.productDetailById);
 router.route("/ChangeStock").post(merchantController.stock);
 router.route("/Category").get(allCategory);
 router.route("/MarkRecommend").post(merchantController.recommended);
-router.route("/ProductList").post(auth, merchantController.productList);
+router.route("/ProductList").post(merchantController.productList);
 // router.route("/ProductList").post(merchantController.productList);
 
 // Accept order 

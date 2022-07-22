@@ -41,6 +41,14 @@ const userSchema = mongoose.Schema({
     maxLength: [2, "Can't get Greater than 2"],
     required: true,
   },
+  deviceVersion: {
+    type: String,
+    required: true,
+  },
+  loginRegion: {
+    type: String,
+    required: true,
+  },
   deviceId: {
     type: String,
     required: true,
