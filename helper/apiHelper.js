@@ -2,6 +2,7 @@ const path = require("path");
 // const fileUpload = require("express-fileupload")
 //
 const mime = require("mime");
+const admin = require("firebase-admin");
 
 const fs = require("fs");
 const constants = require("../constants");
@@ -330,4 +331,29 @@ exports.checkDistance = (lat1, lon1, lat2, lon2) => {
   return d;
 };
 
+var serviceAccount = require('../config/privateKey.json');
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),  
+})
+
+
+exports.sendFcmMessage = (mgsTitle, mgsBody, token) => {  
+  const payload = {    
+    data: {
+      title: mgsTitle,
+      body: mgsBody,
+    },
+  };
+
+  const options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24
+  }
+  admin.messaging().sendToDevice(token, payload, options).then((response) => {
+    console.log("Successfully sent message: ", response);
+  }).catch((error) => {
+    console.log("Error sending message: ", error);
+  });
+
+}

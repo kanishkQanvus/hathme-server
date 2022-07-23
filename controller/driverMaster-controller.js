@@ -11,6 +11,7 @@ const helper = require("../helper/apiHelper");
 const { default: mongoose } = require("mongoose");
 const { find } = require("../model/loginMaster-model");
 // const addTocartModel = require("../")
+const token = ['dyn2Scv0StaVkFymSHIton:APA91bFax0vhqk__eP1gd1tdBxjm_H3EVoJPP8uKqDLMccgJpPjcvkuYjgu3YkJaZ4vB2YMaCv_Pzk3LBX8I9GGQh43Eb0aD6ff8Y5smR25U8BGBGYJDiZqp82IZKa0skMaql5bX2Qg_'];
 const { read } = require("fs");
 const orderModel = require("../model/order-model");
 const genrateOtp = async (userId) => {
@@ -876,6 +877,8 @@ exports.acceptOrder = async (req, res) => {
 
     const result = await orderDetails(order2);
 
+    helper.sendFcmMessage("Driver assigned" ,`${driver.name} is your delivery partner and on his way to pick up the order!`, token);
+
     return res.json(helper.generateServerResponse(1, "200", result));
   }  
   catch(err){
@@ -1001,6 +1004,8 @@ exports.orderPickedUp = async (req, res) => {
   try{
     const {userId} = req.user;
 
+    const driver = await userMasterModel.findById(userId);
+
     const checkReqKey = [
       "orderId",
       "latitude",
@@ -1028,8 +1033,9 @@ exports.orderPickedUp = async (req, res) => {
     if(order.driverId.toString() != userId){
       return res.json(helper.generateServerResponse(0, "119"));
     }
-
-    const merchant = await merchantModel.findById(order.merchantId);
+    
+    const merchant = await merchantModel.findOne({userId: order.merchantId});
+    const user = await userMasterModel.findById(order.userId);    
 
     let mlatitude = merchant.latitude;
     let mlongitude = merchant.longitude;
@@ -1040,6 +1046,10 @@ exports.orderPickedUp = async (req, res) => {
 
     order.status = "4";
     order.save({validateBeforeSave: false});
+
+    
+
+    helper.sendFcmMessage("Order picked up" ,`${driver.name} has picked up your order and on his way to deliver!`, token);
 
     return res.json(helper.generateServerResponse(1, "191", order));
   }
@@ -1067,6 +1077,8 @@ exports.orderDelivered = async (req, res) => {
 
     order.status = "5";
     order.save({validateBeforeSave: false});
+
+    helper.sendFcmMessage("Delivered" ,`Your order has been delivered!`, token);
 
     return res.json(helper.generateServerResponse(1, "187", order));
   }

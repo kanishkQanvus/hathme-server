@@ -1932,6 +1932,8 @@ exports.acceptOrder = async (req, res) => {
       return res.json(helper.generateServerResponse(0, "F"));
     }
 
+    helper.sendFcmMessage("Order accepted" ,`Restaurant has acepted your order and on is cooking!`, token);
+
     return res.json(helper.generateServerResponse(1, "184", orders));
   } catch (error) {
     console.log(error);
@@ -1951,6 +1953,8 @@ exports.cancelOrder = async (req, res) => {
     if (!orders) {
       return res.json(helper.generateServerResponse(0, "F"));
     }
+
+    helper.sendFcmMessage("Order cancelled" ,`Restaurant has cancelled your order due to some reasons!`, token);
     return res.json(helper.generateServerResponse(1, "185", orders));
   } catch (error) {
     console.log(error);
@@ -2013,6 +2017,8 @@ exports.readyOrder = async (req, res) => {
   if(order.status === "2"){
     try{
       let order2 = await orderModel.findByIdAndUpdate({ _id: orderId}, {orderState: "2"}, {new: true});
+
+      helper.sendFcmMessage("Order Ready" ,`Restaurant has prepared your order!`, token);
 
       return res.json(helper.generateServerResponse(1, "190", order2));
     }
