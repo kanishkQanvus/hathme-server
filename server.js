@@ -16,6 +16,7 @@ app.use(express.static("public"));
 app.use("/uploads/panCardImages", express.static("uploads/panCardImages"));
 app.use("/uploads/aadharCardImages", express.static("uploads/aadharCardImages"));
 app.use("/uploads/profileImages", express.static("uploads/profileImages"));
+app.use("/uploads/coverImages", express.static("uploads/coverImages"));
 app.use("/uploads/categoryImages", express.static("uploads/categoryImages"));
 app.use("/uploads/productImages", express.static("uploads/productImages"));
 app.use("/uploads/drivingLicenseImages", express.static("uploads/drivingLicenseImages"));

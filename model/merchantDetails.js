@@ -22,10 +22,21 @@ const merchantSchema = new mongoose.Schema({
   categoryId: {
     type: mongoose.Types.ObjectId,
   },
-  address: {
+  flatNo: {
     type: String,
-    // required: true,
-  
+  },  
+  address1: {
+    type: String,
+    // required: true,  
+  },
+  address2: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  pincode: {
+    type: String,
   },
   latitude: {
     type: String,  

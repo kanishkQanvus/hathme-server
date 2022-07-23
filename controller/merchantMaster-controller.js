@@ -690,9 +690,8 @@ exports.isOnOff = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    let { userId } = req.user;
-    console.log(userId);
-    let { name, profileImage, userName } = req.body[constants.APPNAME];
+    let { userId } = req.user;    
+    let { name, profileImage, email, coverImage, userName, flatNo, address1, address2, city, pincode, latitude, longitude } = req.body[constants.APPNAME];    
     if (userName) {
       let userNameAlreadyExist = await userMasterModel.findOne({
         userName: userName,
@@ -703,21 +702,83 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
+    if(email){
+      let emailAlreadyExist = await userMasterModel.findOne({ email : email});
+
+      if(emailAlreadyExist && emailAlreadyExist._id.toString() != userId ){
+        return res.json(helper.generateServerResponse(0, "102"));
+      }
+    }
+
     let data = {
       name,
-      userName,
+      email,
+      userName,      
     };
+
+    let data2 = {      
+      flatNo,
+      address1,
+      address2,
+      city,
+      pincode,
+      latitude,
+      longitude,
+    }
     if (profileImage) {
       let profilePath = "./uploads/profileImages/";
       const imageName = helper.saveImage(profileImage, userId, profilePath);
-      data = { ...data, profileImage: imageName };
+      data = { ...data, profileImage: process.env.PROFILEIMAGE + imageName };
     }
+
+    if(coverImage){
+      let profilePath = "./uploads/coverImages/";
+      const imageName = helper.saveImage(coverImage, userId, profilePath);
+      data2 = {...data2, coverPhoto: process.env.COVERIMAGE + imageName};
+    }
+
     let updateUser = await userMasterModel.findOneAndUpdate(
       { _id: userId },
       data,
       { new: true }
     );
-    let result = await userDetail(updateUser);
+
+    let updatedUser2 = await merchantModel.findOneAndUpdate({ userId: userId}, data2, {new: true});
+
+    let result = {
+      merchantId: updateUser._id ? updateUser._id : "",
+      name: updateUser.name ? updateUser.name : "",
+      userName: updateUser.userName ? updateUser.userName : "",
+      mobile: updateUser.mobile ? updateUser.mobile : "",
+      userType: updateUser.userType ? updateUser.userType : "",
+      email: updateUser.email ? updateUser.email : "",
+      referralCode: updateUser.referralCode ? updateUser.referralCode : "",      
+      isActive: updateUser.isActive ? updateUser.isActive : "",
+      isMobileVerified: updateUser.isMobileVerified ? updateUser.isMobileVerified : 0,
+      isProfileCompleted: updateUser.isProfileCompleted ? updateUser.isProfileCompleted : 0,
+      countryCode: updateUser.countryCode ? updateUser.countryCode : "",
+      aadharCardNumber: updateUser.aadharCardNumber ? updateUser.aadharCardNumber : "",
+      panCardNumber: updateUser.panCardNumber ? updateUser.panCardNumber : "",
+      profileImage: updateUser.profileImage ? updateUser.profileImage : "",
+      aadharCardBackPicture: updateUser.aadharCardBackPicture
+        ? process.env.AADHARDCARDPICTURE + `${updateUser.aadharCardBackPicture}`
+        : "",
+      aadharCardFrontPicture: updateUser.aadharCardFrontPicture
+        ? process.env.AADHARDCARDPICTURE + `${updateUser.aadharCardFrontPicture}`
+        : "",
+      panCardPicture: updateUser.panCardPicture
+        ? process.env.PANCARDPICTURE + `${updateUser.panCardPicture}`
+        : "",   
+      coverImage: updatedUser2.coverPhoto ? updatedUser2.coverPhoto : "",
+      yearOfOpening: updatedUser2.yearOfOpening ? updatedUser2.yearOfOpening : "",      
+      GSTIN: updatedUser2.GSTIN ? updatedUser2.GSTIN : "",
+      address: updatedUser2.address1 ? updatedUser2.address1 : "",
+      city: updatedUser2.city ? updatedUser2.city : "",
+      pincode: updatedUser2.pincode ? updatedUser2.pincode : "",
+      latitude: updatedUser2.latitude ? updatedUser2.latitude : "",
+      longitude: updatedUser2.longitude ? updatedUser2.longitude : "",
+    };
+    
     res.json(helper.generateServerResponse(1, 123, result));
   } catch (error) {
     console.log(error);
@@ -728,10 +789,7 @@ exports.userVerification = async (req, res) => {
   try {
     const { userId } = req.user;
     let checkReqKey = [
-      "fullName", 
-      "address",
-      "latitude",
-      "longitude",
+      "fullName",       
       "yearOfOpening",
       "GSTIN",
       "panCardNumber",
@@ -751,10 +809,7 @@ exports.userVerification = async (req, res) => {
     const {
       fullName,
       yearOfOpening,
-      GSTIN,
-      address,
-      latitude,
-      longitude,
+      GSTIN,      
       panCardNumber,
       panCardPicture,
       aadharCardNumber,
@@ -767,11 +822,8 @@ exports.userVerification = async (req, res) => {
     };
 
     let data2 = {
-      yearOfOpening,
-      address,
-      GSTIN,
-      latitude,
-      longitude,
+      yearOfOpening,      
+      GSTIN,      
     }
     if (panCardPicture) {
       let date = new Date().getTime().toString();
@@ -837,10 +889,7 @@ exports.userVerification = async (req, res) => {
       panCardPicture: updateUser.panCardPicture
         ? process.env.PANCARDPICTURE + `${updateUser.panCardPicture}`
         : "",   
-      yearOfOpening: updatedUser2.yearOfOpening ? updatedUser2.yearOfOpening : "",
-      address: updatedUser2.address ? updatedUser2.address : "",
-      latitude: updatedUser2.latitude ? updatedUser2.latitude : "",
-      longitude: updatedUser2.longitude ? updatedUser2.longitude : "",
+      yearOfOpening: updatedUser2.yearOfOpening ? updatedUser2.yearOfOpening : "",      
       GSTIN: updatedUser2.GSTIN ? updatedUser2.GSTIN : "",
     };
 
