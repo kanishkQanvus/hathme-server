@@ -76,9 +76,9 @@ router
   .get(merchantController.subProductCategoryList);
 router.route("/AddProductImages").post(merchantController.addProductImage);
 router.route("/DeleteProductImage").post(merchantController.deleteProductImage);
-// router
-//   .route("/MerchantListByCategory")
-//   .post(merchantController.merchantListByCategory);
+router
+  .route("/MerchantListByCategory")
+  .post(merchantController.merchantListByCategory);
 router
   .route("/MerchantDetailedById")
   .get(merchantController.merchantDetailById);
