@@ -14,10 +14,18 @@ const videoCommentsSchema = new mongoose.Schema({
   comment: {
     type: String,
   },
+  status: {
+    type: Number,
+    default: 1
+  },
   createdAt: {
     type: Date,
     default: Date.now()
+  },
+  modifiedAt: {
+    type: Date,
+    default: Date.now()
   }
-});
+}, {timestamps: true});
 
 module.exports = mongoose.model("videoComment", videoCommentsSchema);

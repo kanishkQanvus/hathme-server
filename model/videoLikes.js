@@ -11,11 +11,19 @@ const videoLikesSchema = new mongoose.Schema({
     required: true,
     ref: "userMaster"
   },
+  status: {
+    type: Number,
+    default: 1
+  },
   createdAt: {
+    type: Date,
+    default: Date.now()
+  },
+  modifiedAt: {
     type: Date,
     default: Date.now()
   }
   
-});
+}, {timestamps: true});
 
 module.exports = mongoose.model("videoLike", videoLikesSchema);
