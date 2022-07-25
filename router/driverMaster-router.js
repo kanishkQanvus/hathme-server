@@ -11,13 +11,13 @@ router.post("/OtpVerification", auth, driverController.otpVerification);
 
 router.use(auth);
 
-router.route("/MyProfile").get(driverController.myProfile);
 router.route("/GeneratePin").post(driverController.generatePin);
-router.route("/ChangePassword").post(driverController.changePassword);
 router.route("/ChangePin").post(driverController.changePin);
-router.route("/VerifyPin").post(driverController.pinVerify);
-router.route("/ForgotPassword").post(driverController.forgotPassword);
+router.route("/ChangePassword").post(driverController.changePassword);
 router.route("/ForgotPin").post(driverController.forgotPin);
+router.route("/ForgotPassword").post(driverController.forgotPassword);
+router.route("/MyProfile").get(driverController.myProfile);
+router.route("/VerifyPin").post(driverController.pinVerify);
 router.route("/UserVerify").post(driverController.userVerification);
 router.route("/BankDetails").post(driverController.bankDetails);
 router.route("/getPendingDeliveries").get(driverController.getPendingDeliveries);
