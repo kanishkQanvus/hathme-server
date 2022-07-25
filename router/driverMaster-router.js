@@ -15,6 +15,7 @@ router.route("/MyProfile").get(driverController.myProfile);
 router.route("/GeneratePin").post(driverController.generatePin);
 router.route("/ChangePassword").post(driverController.changePassword);
 router.route("/ChangePin").post(driverController.changePin);
+router.route("/VerifyPin").post(driverController.pinVerify);
 router.route("/ForgotPassword").post(driverController.forgotPassword);
 router.route("/ForgotPin").post(driverController.forgotPin);
 router.route("/UserVerify").post(driverController.userVerification);
