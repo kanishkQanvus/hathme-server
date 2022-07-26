@@ -12,6 +12,7 @@ const { default: mongoose } = require("mongoose");
 const { find } = require("../model/loginMaster-model");
 const productModel = require("../model/products-model");
 const merchantModel = require("../model/merchantDetails");
+const UserVideoModel = require("../model/userCuratedVideos");
 // const addTocartModel = require("../")
 const addToCartModel = require("../model/addToCart-model");
 const userAddressModel = require("../model/userAddress-model");

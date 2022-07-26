@@ -689,29 +689,31 @@ exports.forgotPin = async (req, res) => {
 exports.userVerification = async (req, res) => {
   try {
     const { userId } = req.user;
-    // let checkReqKey = [      
-    //   "address",
-    //   "dateOfBirth",
-    //   "profileImage",
-    //   "panCardNumber",
-    //   "panCardPicture",
-    //   "drivingLicenseFront",
-    //   "drivingLicenseBack",
-    //   "aadharCardNumber",
-    //   "aadharCardFrontPicture",
-    //   "aadharCardBackPicture",
-    // ];
-    // let response = helper.validateJSON(
-    //   req.body[constants.APPNAME],
-    //   checkReqKey
-    // );
+    let checkReqKey = [   
+      "name",
+      "address",
+      "dateOfBirth",
+      "profileImage",
+      "panCardNumber",
+      "panCardPicture",
+      "drivingLicenseFront",
+      "drivingLicenseBack",
+      "aadharCardNumber",
+      "aadharCardFrontPicture",
+      "aadharCardBackPicture",
+    ];
+    let response = helper.validateJSON(
+      req.body[constants.APPNAME],
+      checkReqKey
+    );
 
-    // if (response == 0) {
-    //   console.log("error coming from here");
-    //   return res.json(helper.generateServerResponse(0, "I"));
-    // }    
+    if (response == 0) {
+      console.log("error coming from here");
+      return res.json(helper.generateServerResponse(0, "I"));
+    }    
 
-    const {      
+    const {
+      name,      
       address,
       dateOfBirth,
       profileImage,
@@ -723,7 +725,8 @@ exports.userVerification = async (req, res) => {
       aadharCardFrontPicture,
       aadharCardBackPicture,
     } = req.body[constants.APPNAME];
-    let data = {            
+    let data = {         
+      name,
       dateOfBirth,
       panCardNumber,
       aadharCardNumber,

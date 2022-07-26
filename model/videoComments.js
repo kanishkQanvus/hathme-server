@@ -22,7 +22,7 @@ const videoCommentsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now()
   },
-  modifiedAt: {
+  updatedAt: {
     type: Date,
     default: Date.now()
   }
