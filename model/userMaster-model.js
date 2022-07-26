@@ -97,6 +97,14 @@ const userSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  isProfileVerified: {
+    type: Number,
+    default: 0
+  },
+  isBankDetailsVerified: {
+    type: Number,
+    default: 0
+  },
   countryCode: {
     type: String,
     required: true,

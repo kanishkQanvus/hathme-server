@@ -65,6 +65,8 @@ const userDetail = async (data) => {
     isActive: data.isActive ? data.isActive : "",
     isMobileVerified: data.isMobileVerified ? data.isMobileVerified : 0,
     isProfileCompleted: data.isProfileCompleted ? data.isProfileCompleted : 0,
+    isProfileVerified: data.isProfileVerified ? data.isProfileVerified : 0,
+    isBankDetailsVerified: data.isBankDetailsVerified ? data.isBankDetailsVerified : 0,
     countryCode: data.countryCode ? data.countryCode : "",
     aadharCardNumber: data.aadharCardNumber ? data.aadharCardNumber : "",
     panCardNumber: data.panCardNumber ? data.panCardNumber : "",
