@@ -62,6 +62,7 @@ const userDetail = async (data) => {
     isActive: data.isActive ? data.isActive : "",
     isMobileVerified: data.isMobileVerified ? data.isMobileVerified : 0,
     isProfileCompleted: data.isProfileCompleted ? data.isProfileCompleted : 0,
+    isBankDetailsCompleted: data.isBankDetailsCompleted ? data.isBankDetailsCompleted : 0,
     isProfileVerified: data.isProfileVerified ? data.isProfileVerified : 0,
     isBankDetailsVerified: data.isBankDetailsVerified ? data.isBankDetailsVerified : 0,
     countryCode: data.countryCode ? data.countryCode : "",
@@ -511,7 +512,7 @@ exports.generatePin = async (req, res) => {
     pin = await bcrypt.hash(pin, salt);
     let user = await userMasterModel.findByIdAndUpdate(
       userId,
-      { pin: pin, isProfileCompleted: 1 },
+      { pin: pin},
       { new: true }
     );
     let data = await userDetail(user);
@@ -798,6 +799,8 @@ exports.userVerification = async (req, res) => {
     }
 
     let userAddress = await driverDetails.findOneAndUpdate({userId: userId}, {address: address});
+
+    data = {...data, isProfileCompleted: 1};
     
     let updateUser = await userMasterModel.findOneAndUpdate(
       { _id: userId },
@@ -831,6 +834,13 @@ exports.bankDetails = async (req, res) => {
   try {
     const { userId } = req.user;
     const result = req.body[constants.APPNAME];
+
+    const user = await userMasterModel.findById(userId);
+
+    if(!user){
+      return res.json(helper.generateServerResponse(0, "170"));
+    }
+
     const data = await bankDetails.findOne({ userId: userId });
     if (data) {
       const bankDetailUpdate = await bankDetails.findOneAndUpdate(
@@ -849,6 +859,9 @@ exports.bankDetails = async (req, res) => {
       branch: result.branch,
       accountType: result.accountType,
     });
+
+    let updatedUser = await userMasterModel.findByIdAndUpdate(userId, {isBankDetailsCompleted: 1}, {new: true});
+
     res.json(helper.generateServerResponse(1, 142));
   } catch (error) {
     res.json(helper.generateServerResponse(0, 105));

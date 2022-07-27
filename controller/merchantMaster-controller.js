@@ -65,6 +65,7 @@ const userDetail = async (data) => {
     isActive: data.isActive ? data.isActive : "",
     isMobileVerified: data.isMobileVerified ? data.isMobileVerified : 0,
     isProfileCompleted: data.isProfileCompleted ? data.isProfileCompleted : 0,
+    isBankDetailsCompleted: data.isBankDetailsCompleted ? data.isBankDetailsCompleted : 0,
     isProfileVerified: data.isProfileVerified ? data.isProfileVerified : 0,
     isBankDetailsVerified: data.isBankDetailsVerified ? data.isBankDetailsVerified : 0,
     countryCode: data.countryCode ? data.countryCode : "",
@@ -857,6 +858,9 @@ exports.userVerification = async (req, res) => {
       );
       data = { ...data, aadharCardBackPicture: imageName };
     }
+
+    data = {...data, isProfileCompleted: 1};
+
     let updateUser = await userMasterModel.findOneAndUpdate(
       { _id: userId },
       data,
@@ -875,7 +879,7 @@ exports.userVerification = async (req, res) => {
       referralCode: updateUser.referralCode ? updateUser.referralCode : "",      
       isActive: updateUser.isActive ? updateUser.isActive : "",
       isMobileVerified: updateUser.isMobileVerified ? updateUser.isMobileVerified : 0,
-      isProfileCompleted: updateUser.isProfileCompleted ? updateUser.isProfileCompleted : 0,
+      isProfileCompleted: updateUser.isProfileCompleted ? updateUser.isProfileCompleted : 0,            
       countryCode: updateUser.countryCode ? updateUser.countryCode : "",
       aadharCardNumber: updateUser.aadharCardNumber ? updateUser.aadharCardNumber : "",
       panCardNumber: updateUser.panCardNumber ? updateUser.panCardNumber : "",
@@ -917,7 +921,13 @@ exports.bankDetails = async (req, res) => {
     return res.json(helper.generateServerResponse(0, "I"));
   }
   try {
-    const { userId } = req.user;
+    const { userId } = req.user;    
+    const user = await userMasterModel.findById(userId);
+
+    if(!user){
+      return res.json(helper.generateServerResponse(0, "170"));
+    }
+
     const result = req.body[constants.APPNAME];
     const data = await bankDetails.findOne({ userId: userId });
     if (data) {
@@ -937,6 +947,9 @@ exports.bankDetails = async (req, res) => {
       branch: result.branch,
       accountType: result.accountType,
     });
+
+    let updatedUser = await userMasterModel.findByIdAndUpdate(userId, {isBankDetailsCompleted: 1}, {new: true});
+
     res.json(helper.generateServerResponse(1, 142));
   } catch (error) {
     res.json(helper.generateServerResponse(0, 105));

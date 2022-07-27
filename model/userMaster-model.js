@@ -95,15 +95,19 @@ const userSchema = mongoose.Schema({
   },
   isProfileCompleted: {
     type: Number,
-    default: 0,
+    default: 0,   // 0: Not complete // 1: Completed
+  },
+  isBankDetailsCompleted: {
+    type: Number,
+    default: 0,  // 0: Not complete // 1: Completed
   },
   isProfileVerified: {
     type: Number,
-    default: 0
+    default: 0   // 0: Pending // 1: Verified  // 2: Rejected
   },
   isBankDetailsVerified: {
     type: Number,
-    default: 0
+    default: 0   // 0: Pending // 1: Verified  // 2: Rejected
   },
   countryCode: {
     type: String,
