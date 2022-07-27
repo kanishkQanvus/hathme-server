@@ -2859,14 +2859,8 @@ exports.videoUpload = async (req, res, next) => {
       };
       const result = await UserVideoModel(data);
       result.save();
-      res.status(200).json({
-        status: "success",
-        message: "Video sucessfully uploaded",
-        fullName: user.name,
-        emailId: user.email,
-        mobileNo: user.mobile,
-        result,
-      });
+
+      return res.json(helper.generateServerResponse(1, "203", result));      
     }
   } catch (error) {
     console.log(error);
