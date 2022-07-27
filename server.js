@@ -20,7 +20,10 @@ app.use("/uploads/coverImages", express.static("uploads/coverImages"));
 app.use("/uploads/categoryImages", express.static("uploads/categoryImages"));
 app.use("/uploads/productImages", express.static("uploads/productImages"));
 app.use("/uploads/drivingLicenseImages", express.static("uploads/drivingLicenseImages"));
+app.use("/uploads/userVideos/videos", express.static("uploads/userVideos/videos"));
+app.use("/uploads/userVideos/reels", express.static("uploads/userVideos/reels"));
 app.use("/uploads/qrcode", express.static("uploads/qrcode"));
+
 
 
 // for Device Info

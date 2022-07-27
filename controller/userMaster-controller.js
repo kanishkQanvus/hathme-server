@@ -4,6 +4,7 @@ const firendListModel = require("../model/friendList-model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const QRCode = require("qrcode");
+const multer = require("multer");
 const userMasterModel = require("../model/userMaster-model");
 const constants = require("../constants");
 const helper = require("../helper/apiHelper");
@@ -2798,5 +2799,77 @@ exports.findUser = async (req, res) => {
     }
   } catch (error) {
     res.json(helper.generateServerResponse(1, 134, searchData));
+  }
+};
+
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const type = req.body.type;    
+    let path;
+    if(type == 1){
+      path = "./uploads/userVideos/videos";
+    }
+    else if(type == 2){
+      path = "./uploads/userVideos/reels";
+    }    
+    
+    cb(null, path);
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `user-${req.user.userId}-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("video")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Not a video File!!"), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+exports.uploadVideos = upload.single("video");
+
+exports.videoUpload = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const type = req.body.type;
+
+    const user = await userMasterModel.findById(userId);
+    let data = req.file;
+    let name = data.filename;
+
+    destination = data.destination.slice(1);
+
+    let path = process.env.SERVER + destination + "/" + name;
+    if (!type || !userId) {
+      return res.json(helper.generateServerResponse(1, "I"));
+    } else if (!user) {
+      return res.json(helper.generateServerResponse(0, 170));
+    } else if (user) {
+      const data = {
+        userId: userId,
+        type: type,
+        videoUrl: path,
+      };
+      const result = await UserVideoModel(data);
+      result.save();
+      res.status(200).json({
+        status: "success",
+        message: "Video sucessfully uploaded",
+        fullName: user.name,
+        emailId: user.email,
+        mobileNo: user.mobile,
+        result,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json(helper.generateServerResponse(0, "I"));
   }
 };
