@@ -13,7 +13,7 @@ router.route("/OtpVerification").post(auth, merchantController.otpVerification);
 
 router.use(auth);
 
-router.route("/MerchantProfile").get(merchantController.merchantProfile);
+router.route("/MyProfile").get(merchantController.merchantProfile);
 router.route("/VerifyPin").post(merchantController.pinVerify);
 router.route("/Logout").post(merchantController.logoutMerchant);
 router.route("/ResendOtp").get(merchantController.resendOtp);
