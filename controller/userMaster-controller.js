@@ -417,7 +417,7 @@ exports.loginUser = async (req, res) => {
       "fcmId",
       "deviceName",
       "deviceVersion",
-      "manufacturer",      
+      "manufacturer",
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
@@ -427,16 +427,10 @@ exports.loginUser = async (req, res) => {
     if (response == 0) {
       return res.json(helper.generateServerResponse(0, "I"));
     }
-    const {
-      email,
-      password,
-      fcmId,
-      deviceName,
-      deviceVersion,
-      manufacturer,     
-    } = req.body[constants.APPNAME];
+    const { email, password, fcmId, deviceName, deviceVersion, manufacturer } =
+      req.body[constants.APPNAME];
 
-    const header = req.user;    
+    const header = req.user;
 
     const result = await userMasterModel.findOne({ email: email });
 
@@ -491,7 +485,7 @@ exports.loginUser = async (req, res) => {
       loginTime: new Date(Date.now()).toISOString(),
       isLogin: 1,
       languageCode: header.languageCode,
-      loginRegion: header.loginRegion
+      loginRegion: header.loginRegion,
     });
     let data = await userDetail(result);
     data = {
@@ -571,13 +565,8 @@ exports.otpVerification = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const {
-      otp,
-      fcmId,
-      deviceName,
-      deviceVersion,
-      manufacturer,      
-    } = req.body[constants.APPNAME];
+    const { otp, fcmId, deviceName, deviceVersion, manufacturer } =
+      req.body[constants.APPNAME];
 
     const loginTime = new Date(Date.now()).toISOString();
     let checkReqKey = [
@@ -585,7 +574,7 @@ exports.otpVerification = async (req, res) => {
       "fcmId",
       "deviceName",
       "deviceVersion",
-      "manufacturer",      
+      "manufacturer",
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
@@ -596,7 +585,7 @@ exports.otpVerification = async (req, res) => {
       return res.json(helper.generateServerResponse(0, "I"));
     }
 
-    const header = req.user;    
+    const header = req.user;
 
     let data = await userMasterModel.findOne({ _id: userId });
     if (data) {
@@ -619,7 +608,7 @@ exports.otpVerification = async (req, res) => {
           deviceName,
           deviceVersion,
           loginRegion: header.loginRegion,
-          languagecode: data.languageCode
+          languagecode: data.languageCode,
         });
 
         let result = await userDetail(user);
@@ -1408,15 +1397,14 @@ exports.categoryBasedOnMerchent = async (req, res) => {
 
     await Promise.all(
       merchants.map(async (merchant) => {
-        
         const data = await requestMerchantrDetail(merchant.userId);
 
-        if(data){
+        if (data) {
           result.push(data);
         }
       })
-    );    
-    
+    );
+
     result = [...new Set(result.map((a) => JSON.stringify(a)))].map((a) =>
       JSON.parse(a)
     );
@@ -2804,15 +2792,14 @@ exports.findUser = async (req, res) => {
 
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const type = req.body.type;    
+    const type = req.body.type;
     let path;
-    if(type == 1){
+    if (type == 1) {
       path = "./uploads/userVideos/videos";
-    }
-    else if(type == 2){
+    } else if (type == 2) {
       path = "./uploads/userVideos/reels";
-    }    
-    
+    }
+
     cb(null, path);
   },
   filename: (req, file, cb) => {
@@ -2832,38 +2819,47 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
-});
-exports.uploadVideos = upload.single("video");
+}).single("video");
 
 exports.videoUpload = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const type = req.body.type;
 
-    const user = await userMasterModel.findById(userId);
-    let data = req.file;
-    let name = data.filename;
+    return upload(req, res, async (err) => {
+      if (err) {
+        console.log("Error uploading file!");
+        return res.json(helper.generateServerResponse(0, "204"));
+      }
 
-    destination = data.destination.slice(1);
+      let data = req.file;
+      let type = req.body.type;
 
-    let path = process.env.SERVER + destination + "/" + name;
-    if (!type || !userId) {
-      return res.json(helper.generateServerResponse(1, "I"));
-    } else if (!user) {
-      return res.json(helper.generateServerResponse(0, 170));
-    } else if (user) {
-      const data = {
+      const user = await userMasterModel.findById(userId);
+      let name = data.filename;
+
+      destination = data.destination.slice(1);
+
+      let path = process.env.SERVER + destination + "/" + name;
+      if (!type) {
+        return res.json(helper.generateServerResponse(1, "I"));
+      }
+
+      if (!user) {
+        return res.json(helper.generateServerResponse(0, "170"));
+      }
+
+      const data2 = {
         userId: userId,
         type: type,
         videoUrl: path,
       };
-      const result = await UserVideoModel(data);
+      const result = await UserVideoModel(data2);
       result.save();
 
-      return res.json(helper.generateServerResponse(1, "203", result));      
-    }
+      return res.json(helper.generateServerResponse(1, "203", result));
+    });
   } catch (error) {
     console.log(error);
-    res.json(helper.generateServerResponse(0, "I"));
+    return res.json(helper.generateServerResponse(0, "I"));
   }
 };

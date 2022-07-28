@@ -80,7 +80,7 @@ router.route("/SearchCategory").get(searchCategory);
 
 router
   .route("/UploadVideo")
-  .post(userController.uploadVideos, userController.videoUpload);
+  .post(userController.videoUpload);
 
 module.exports = router;
 

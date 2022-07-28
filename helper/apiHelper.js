@@ -114,7 +114,8 @@ const messages = function (resMsg) {
   codes[200] = "Driver has accepted the order";
   codes[201] = "User is offline!";
   codes[202] = "Please reach near the pickup location to verify order!";
-  codes[203] = "Video sucessfully uploaded1";
+  codes[203] = "Video sucessfully uploaded!";
+  codes[204] = "Error uploading video"
 
   return codes[resMsg];
 };
