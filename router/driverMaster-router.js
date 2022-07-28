@@ -20,8 +20,11 @@ router.route("/MyProfile").get(driverController.myProfile);
 router.route("/VerifyPin").post(driverController.pinVerify);
 router.route("/UserVerify").post(driverController.userVerification);
 router.route("/BankDetails").post(driverController.bankDetails);
-router.route("/getPendingDeliveries").get(driverController.getPendingDeliveries);
 router.route("/Status").post(driverController.isOnOff);
+
+router.use(driverController.checkOnOffStatus);  // Check if driver is online or not
+
+router.route("/getPendingDeliveries").get(driverController.getPendingDeliveries);
 router.route("/acceptOrder").post(driverController.acceptOrder);
 router.route('/getAcceptedOrders').get(driverController.getAcceptedOrders);
 router.route('/orderDetails/:orderId').get(driverController.orderDetails);

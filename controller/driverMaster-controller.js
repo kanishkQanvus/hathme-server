@@ -931,6 +931,19 @@ exports.isOnOff = async (req, res) => {
   }
 };
 
+exports.checkOnOffStatus = async (req, res, next) => {
+  const {userId} = req.user;
+
+  const driver = await driverDetails.findOne({userId});
+
+  if(driver.isOnOff === 0){
+    return res.json(helper.generateServerResponse(0, "201"));
+  }
+
+  next();
+}
+
+
 exports.acceptOrder = async (req, res) => {
   try{
     const {userId} = req.user;
