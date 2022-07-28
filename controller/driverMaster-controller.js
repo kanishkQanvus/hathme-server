@@ -624,33 +624,6 @@ exports.changePin = async (req, res) => {
   }
 };
 
-exports.pinVerify = async (req, res) => {
-  try {
-    let checkReqKey = ["pin"];
-    let response = helper.validateJSON(
-      req.body[constants.APPNAME],
-      checkReqKey
-    );
-    if (response == 0) {
-      return res.json(helper.generateServerResponse(0, "I"));
-    }
-
-    const { userId } = req.user;
-    const { pin } = req.body[constants.APPNAME];
-    const result = await userMasterModel.findOne({ _id: userId });
-    if (result) {
-      const verify = await bcrypt.compare(pin, result.pin);
-      if (!verify) {
-        return res.json(helper.generateServerResponse(0, 113));
-      }
-      return res.json(helper.generateServerResponse(1, 138));
-    }
-    return res.json(helper.generateServerResponse(0, "F"));
-  } catch (error) {
-    res.json(helper.generateServerResponse(0, "I"));
-  }
-};
-
 exports.forgotPassword = async (req, res) => {
   try {
     let checkReqKey = ["email"];
