@@ -101,6 +101,18 @@ const userDetails2 = async (data) => {
   return result;
 }
 
+const filterBankDetails = async (data) => {
+  let result = {
+    bankName: data.bankName ? data.bankName : "",
+    accountNumber: data.accountNumber ? data.accountNumber : "",
+    ifsc: data.ifsc ? data.ifsc : "",
+    branch: data.branch ? data.branch : "",
+    accountType: data.accountType ? data.accountType : "",
+  }
+
+  return result;
+}
+
 const shortUserDetail = async (data) => {
   if (data.length == 0) {
     return [];
@@ -253,10 +265,12 @@ exports.myProfile = async (req, res) => {
 
     let result = await userMasterModel.findById({ _id: userId });
     let result2 = await driverDetails.findOne({userId: userId});
+    let bankDetail = await bankDetails.findOne({userId: userId});
 
     let data = await userDetail(result);
     let data2 = await userDetails2(result2);
-    data = {...data, ...data2};
+    let data3 = await filterBankDetails(bankDetail);
+    data = {...data, ...data2, ...data3};
     res.json(helper.generateServerResponse(1, "S", data));
   } catch (error) {
     res.json(helper.generateServerResponse(0, "I"));
