@@ -91,6 +91,16 @@ const userDetail = async (data) => {
   return result;
 };
 
+const userDetails2 = async (data) => {
+  let result = {
+    isOnOff: data.isOnOff ? data.isOnOff : 0,
+    address: data.address ? data.address : "",
+    rating: data.rating ? data.rating : "",
+  }
+
+  return result;
+}
+
 const shortUserDetail = async (data) => {
   if (data.length == 0) {
     return [];
@@ -242,7 +252,11 @@ exports.myProfile = async (req, res) => {
     const { userId } = req.user;
 
     let result = await userMasterModel.findById({ _id: userId });
+    let result2 = await driverDetails.findOne({userId: userId});
+
     let data = await userDetail(result);
+    let data2 = await userDetails2(result2);
+    data = {...data, ...data2};
     res.json(helper.generateServerResponse(1, "S", data));
   } catch (error) {
     res.json(helper.generateServerResponse(0, "I"));
@@ -966,7 +980,7 @@ exports.getPendingDeliveries = async (req, res) => {
 
     const user = driverDetails.findById(userId);
 
-    if(user.isOnOff === 2){
+    if(user.isOnOff === 0){
       return res.json(helper.generateServerResponse(0, "201"));
     }
 

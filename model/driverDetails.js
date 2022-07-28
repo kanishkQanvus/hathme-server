@@ -9,7 +9,7 @@ const driverSchema = new mongoose.Schema({
   isOnOff: {
     type: Number,
     required: true,
-    default: 2,
+    default: 0,
   },
   createdAt: {
     type: Date,
@@ -22,12 +22,7 @@ const driverSchema = new mongoose.Schema({
   address: {
     type: String,
     // required: true,  
-  },
-  profilePhoto: { 
-    type: String,
-    // required: true,
-    default: "01_profile_photo.jpg",
-  },
+  },  
   rating:{
     type:String,
     default:0
