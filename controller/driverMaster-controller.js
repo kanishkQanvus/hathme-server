@@ -11,7 +11,9 @@ const helper = require("../helper/apiHelper");
 const { default: mongoose } = require("mongoose");
 const { find } = require("../model/loginMaster-model");
 // const addTocartModel = require("../")
-const token = ['dyn2Scv0StaVkFymSHIton:APA91bFax0vhqk__eP1gd1tdBxjm_H3EVoJPP8uKqDLMccgJpPjcvkuYjgu3YkJaZ4vB2YMaCv_Pzk3LBX8I9GGQh43Eb0aD6ff8Y5smR25U8BGBGYJDiZqp82IZKa0skMaql5bX2Qg_'];
+const token = [
+  "dyn2Scv0StaVkFymSHIton:APA91bFax0vhqk__eP1gd1tdBxjm_H3EVoJPP8uKqDLMccgJpPjcvkuYjgu3YkJaZ4vB2YMaCv_Pzk3LBX8I9GGQh43Eb0aD6ff8Y5smR25U8BGBGYJDiZqp82IZKa0skMaql5bX2Qg_",
+];
 const { read } = require("fs");
 const orderModel = require("../model/order-model");
 const genrateOtp = async (userId) => {
@@ -62,9 +64,13 @@ const userDetail = async (data) => {
     isActive: data.isActive ? data.isActive : "",
     isMobileVerified: data.isMobileVerified ? data.isMobileVerified : 0,
     isProfileCompleted: data.isProfileCompleted ? data.isProfileCompleted : 0,
-    isBankDetailsCompleted: data.isBankDetailsCompleted ? data.isBankDetailsCompleted : 0,
+    isBankDetailsCompleted: data.isBankDetailsCompleted
+      ? data.isBankDetailsCompleted
+      : 0,
     isProfileVerified: data.isProfileVerified ? data.isProfileVerified : 0,
-    isBankDetailsVerified: data.isBankDetailsVerified ? data.isBankDetailsVerified : 0,
+    isBankDetailsVerified: data.isBankDetailsVerified
+      ? data.isBankDetailsVerified
+      : 0,
     countryCode: data.countryCode ? data.countryCode : "",
     aadharCardNumber: data.aadharCardNumber ? data.aadharCardNumber : "",
     panCardNumber: data.panCardNumber ? data.panCardNumber : "",
@@ -79,39 +85,47 @@ const userDetail = async (data) => {
       : "",
     panCardPicture: data.panCardPicture
       ? process.env.PANCARDPICTURE + `${data.panCardPicture}`
-      : "", 
-      drivingLicenseFront: data.drivingLicenseFront
+      : "",
+    drivingLicenseFront: data.drivingLicenseFront
       ? process.env.DRIVINGLICENSE + `${data.drivingLicenseFront}`
-      : "",    
-      drivingLicenseBack: data.drivingLicenseBack
+      : "",
+    drivingLicenseBack: data.drivingLicenseBack
       ? process.env.DRIVINGLICENSE + `${data.drivingLicenseBack}`
-      : "",    
+      : "",
     // randNum: data.randNum ? data.randNum : "",
   };
   return result;
 };
 
 const userDetails2 = async (data) => {
+  if (!data) {
+    return;
+  }
+
   let result = {
     isOnOff: data.isOnOff ? data.isOnOff : 0,
     address: data.address ? data.address : "",
     rating: data.rating ? data.rating : "",
-  }
+  };
 
   return result;
-}
+};
 
 const filterBankDetails = async (data) => {
+  if (!data) {
+    return;
+  }
+
   let result = {
     bankName: data.bankName ? data.bankName : "",
     accountNumber: data.accountNumber ? data.accountNumber : "",
     ifsc: data.ifsc ? data.ifsc : "",
     branch: data.branch ? data.branch : "",
     accountType: data.accountType ? data.accountType : "",
-  }
+  };
 
   return result;
-}
+};
 
 const shortUserDetail = async (data) => {
   if (data.length == 0) {
@@ -133,7 +147,7 @@ const shortUserDetail = async (data) => {
 };
 
 const orderDetails = async (data) => {
-  if(data.length == 0){
+  if (data.length == 0) {
     return [];
   }
 
@@ -141,11 +155,11 @@ const orderDetails = async (data) => {
     orderId: data._id ? data._id : "",
     orderNo: data.orderId ? data.orderId : "",
     products: data.products ? data.products : [],
-    driverId: data.driverId ? data.driverId : "",    
-  }
-  
+    driverId: data.driverId ? data.driverId : "",
+  };
+
   return result;
-}
+};
 
 exports.newDriver = async (req, res) => {
   const APPNAME = constants.APPNAME;
@@ -157,11 +171,11 @@ exports.newDriver = async (req, res) => {
       "email",
       "password",
       "referralCode",
-      "countryCode",      
+      "countryCode",
       "fcmId",
       "deviceName",
       "deviceVersion",
-      "manufacturer",            
+      "manufacturer",
     ];
 
     let response = helper.validateJSON(
@@ -181,11 +195,11 @@ exports.newDriver = async (req, res) => {
       fcmId,
       deviceName,
       deviceVersion,
-      manufacturer,      
-      countryCode,           
+      manufacturer,
+      countryCode,
     } = req.body[constants.APPNAME];
 
-    const header = req.user;    
+    const header = req.user;
 
     let referredFrom = null;
     const userAlreadyExistEmail = await userMasterModel.find({ email });
@@ -264,15 +278,17 @@ exports.myProfile = async (req, res) => {
     const { userId } = req.user;
 
     let result = await userMasterModel.findById({ _id: userId });
-    let result2 = await driverDetails.findOne({userId: userId});
-    let bankDetail = await bankDetails.findOne({userId: userId});
+    let result2 = await driverDetails.findOne({ userId: userId });
+    let bankDetail = await bankDetails.findOne({ userId: userId });
 
-    let data = await userDetail(result);
-    let data2 = await userDetails2(result2);
-    let data3 = await filterBankDetails(bankDetail);
-    data = {...data, ...data2, ...data3};
+    data = await userDetail(result);
+    data2 = await userDetails2(result2);
+    data3 = await filterBankDetails(bankDetail);    
+
+    data = { ...data, ...data2, ...data3 };
     res.json(helper.generateServerResponse(1, "S", data));
   } catch (error) {
+    console.log(error);
     res.json(helper.generateServerResponse(0, "I"));
   }
 };
@@ -285,7 +301,7 @@ exports.loginDriver = async (req, res) => {
       "fcmId",
       "deviceName",
       "deviceVersion",
-      "manufacturer",      
+      "manufacturer",
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
@@ -295,18 +311,12 @@ exports.loginDriver = async (req, res) => {
     if (response == 0) {
       return res.json(helper.generateServerResponse(0, "I"));
     }
-    const {
-      email,
-      password,
-      fcmId,
-      deviceName,
-      deviceVersion,
-      manufacturer,      
-    } = req.body[constants.APPNAME];
+    const { email, password, fcmId, deviceName, deviceVersion, manufacturer } =
+      req.body[constants.APPNAME];
 
-    const header = req.user;        
+    const header = req.user;
 
-    const result = await userMasterModel.findOne({ email: email});
+    const result = await userMasterModel.findOne({ email: email });
 
     if (!result) {
       return res.json(helper.generateServerResponse(0, 125));
@@ -345,10 +355,10 @@ exports.loginDriver = async (req, res) => {
         index.isLogin = 2;
       }
       await index.save();
-    });        
+    });
 
     const newDeviceLogin = await loginMaster.create({
-      userId: result._id,      
+      userId: result._id,
       deviceType: header.deviceType,
       deviceId: header.deviceId,
       fcmId,
@@ -358,14 +368,14 @@ exports.loginDriver = async (req, res) => {
       deviceName,
       deviceVersion,
       loginTime: new Date(Date.now()).toISOString(),
-      isLogin: 1,      
+      isLogin: 1,
       languageCode: header.languageCode,
-      loginRegion: header.loginRegion
+      loginRegion: header.loginRegion,
     });
     let data = await userDetail(result);
     data = {
       ...data,
-      loginId: newDeviceLogin._id,      
+      loginId: newDeviceLogin._id,
       token,
     };
 
@@ -440,13 +450,8 @@ exports.otpVerification = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const {
-      otp,
-      fcmId,
-      deviceName,
-      deviceVersion,
-      manufacturer,      
-    } = req.body[constants.APPNAME];
+    const { otp, fcmId, deviceName, deviceVersion, manufacturer } =
+      req.body[constants.APPNAME];
 
     const loginTime = new Date(Date.now()).toISOString();
     let checkReqKey = [
@@ -454,19 +459,19 @@ exports.otpVerification = async (req, res) => {
       "fcmId",
       "deviceName",
       "deviceVersion",
-      "manufacturer",      
+      "manufacturer",
     ];
     let response = helper.validateJSON(
       req.body[constants.APPNAME],
       checkReqKey
     );
-  
+
     if (response == 0) {
       console.log("hello error");
       return res.json(helper.generateServerResponse(0, "I"));
     }
 
-    const header = req.user;    
+    const header = req.user;
 
     let data = await userMasterModel.findOne({ _id: userId });
     if (data) {
@@ -489,7 +494,7 @@ exports.otpVerification = async (req, res) => {
           deviceName,
           deviceVersion,
           loginRegion: header.loginRegion,
-          languagecode: data.languageCode
+          languagecode: data.languageCode,
         });
 
         let result = await userDetail(user);
@@ -540,7 +545,7 @@ exports.generatePin = async (req, res) => {
     pin = await bcrypt.hash(pin, salt);
     let user = await userMasterModel.findByIdAndUpdate(
       userId,
-      { pin: pin},
+      { pin: pin },
       { new: true }
     );
     let data = await userDetail(user);
@@ -693,7 +698,7 @@ exports.forgotPin = async (req, res) => {
 exports.userVerification = async (req, res) => {
   try {
     const { userId } = req.user;
-    let checkReqKey = [   
+    let checkReqKey = [
       "name",
       "address",
       "dateOfBirth",
@@ -714,10 +719,10 @@ exports.userVerification = async (req, res) => {
     if (response == 0) {
       console.log("error coming from here");
       return res.json(helper.generateServerResponse(0, "I"));
-    }    
+    }
 
     const {
-      name,      
+      name,
       address,
       dateOfBirth,
       profileImage,
@@ -729,21 +734,19 @@ exports.userVerification = async (req, res) => {
       aadharCardFrontPicture,
       aadharCardBackPicture,
     } = req.body[constants.APPNAME];
-    let data = {         
+    let data = {
       name,
       dateOfBirth,
       panCardNumber,
       aadharCardNumber,
     };
 
-    
-
-    if(profileImage){      
+    if (profileImage) {
       let date = new Date().getTime().toString();
       let name = userId + "-profile-" + date;
       let folderPath = "./uploads/profileImages/";
       const imageName = helper.saveImage(profileImage, name, folderPath);
-      data = {...data, profileImage: imageName};
+      data = { ...data, profileImage: imageName };
     }
 
     if (panCardPicture) {
@@ -757,22 +760,14 @@ exports.userVerification = async (req, res) => {
       let date = new Date().getTime().toString();
       let folderPath = "./uploads/drivingLicenseImages/";
       let name = userId + "-LicenseFront-" + date;
-      const imageName = helper.saveImage(
-        drivingLicenseFront,
-        name,
-        folderPath
-      );
+      const imageName = helper.saveImage(drivingLicenseFront, name, folderPath);
       data = { ...data, drivingLicenseFront: imageName };
     }
     if (drivingLicenseBack) {
       let date = new Date().getTime().toString();
       let folderPath = "./uploads/drivingLicenseImages/";
       let name = userId + "-LicenseBack-" + date;
-      const imageName = helper.saveImage(
-        drivingLicenseBack,
-        name,
-        folderPath
-      );
+      const imageName = helper.saveImage(drivingLicenseBack, name, folderPath);
       data = { ...data, drivingLicenseBack: imageName };
     }
 
@@ -799,10 +794,13 @@ exports.userVerification = async (req, res) => {
       data = { ...data, aadharCardBackPicture: imageName, folderPath };
     }
 
-    let userAddress = await driverDetails.findOneAndUpdate({userId: userId}, {address: address});
+    let userAddress = await driverDetails.findOneAndUpdate(
+      { userId: userId },
+      { address: address }
+    );
 
-    data = {...data, isProfileCompleted: 1};
-    
+    data = { ...data, isProfileCompleted: 1 };
+
     let updateUser = await userMasterModel.findOneAndUpdate(
       { _id: userId },
       data,
@@ -810,7 +808,7 @@ exports.userVerification = async (req, res) => {
     );
 
     let result = await userDetail(updateUser);
-    result = {...result, address};
+    result = { ...result, address };
 
     res.json(helper.generateServerResponse(1, "S", result));
   } catch (error) {
@@ -819,7 +817,7 @@ exports.userVerification = async (req, res) => {
   }
 };
 
-exports.bankDetails = async (req, res) => {  
+exports.bankDetails = async (req, res) => {
   let checkReqKey = [
     "name",
     "bankName",
@@ -838,7 +836,7 @@ exports.bankDetails = async (req, res) => {
 
     const user = await userMasterModel.findById(userId);
 
-    if(!user){
+    if (!user) {
       return res.json(helper.generateServerResponse(0, "170"));
     }
 
@@ -861,7 +859,11 @@ exports.bankDetails = async (req, res) => {
       accountType: result.accountType,
     });
 
-    let updatedUser = await userMasterModel.findByIdAndUpdate(userId, {isBankDetailsCompleted: 1}, {new: true});
+    let updatedUser = await userMasterModel.findByIdAndUpdate(
+      userId,
+      { isBankDetailsCompleted: 1 },
+      { new: true }
+    );
 
     res.json(helper.generateServerResponse(1, 142));
   } catch (error) {
@@ -888,7 +890,7 @@ exports.isOnOff = async (req, res) => {
 
     let user2 = await userMasterModel.findById(userId);
 
-    if(user2.isProfileCompleted === 0){
+    if (user2.isProfileCompleted === 0) {
       return res.json(helper.generateServerResponse(0, "198"));
     }
 
@@ -905,99 +907,110 @@ exports.isOnOff = async (req, res) => {
 };
 
 exports.checkOnOffStatus = async (req, res, next) => {
-  const {userId} = req.user;
+  const { userId } = req.user;
 
-  const driver = await driverDetails.findOne({userId});
+  const driver = await driverDetails.findOne({ userId });
 
-  if(driver.isOnOff === 0){
+  if (driver.isOnOff === 0) {
     return res.json(helper.generateServerResponse(0, "201"));
   }
 
   next();
-}
-
+};
 
 exports.acceptOrder = async (req, res) => {
-  try{
-    const {userId} = req.user;
+  try {
+    const { userId } = req.user;
 
-    const {orderId} = req.body[constants.APPNAME];
+    const { orderId } = req.body[constants.APPNAME];
 
     const order = await orderModel.findById(orderId);
     const user = await userMasterModel.findById(userId);
 
-    if(order.driverId){
+    if (order.driverId) {
       return res.json(helper.generateServerResponse(0, "199"));
     }
-  
-    let order2 = await orderModel.findByIdAndUpdate(orderId, {
-      driverId: userId
-    }, {new: true});
+
+    let order2 = await orderModel.findByIdAndUpdate(
+      orderId,
+      {
+        driverId: userId,
+      },
+      { new: true }
+    );
 
     const result = await orderDetails(order2);
 
-    helper.sendFcmMessage("Driver assigned" ,`${driver.name} is your delivery partner and on his way to pick up the order!`, token);
+    helper.sendFcmMessage(
+      "Driver assigned",
+      `${driver.name} is your delivery partner and on his way to pick up the order!`,
+      token
+    );
 
     return res.json(helper.generateServerResponse(1, "200", result));
-  }  
-  catch(err){
+  } catch (err) {
     console.log(err);
     return res.json(helper.generateServerResponse(0, "I"));
   }
-}
+};
 
 exports.getAcceptedOrders = async (req, res) => {
-  try{
-    const {userId} = req.user;
+  try {
+    const { userId } = req.user;
 
-    const orders = await orderModel.find({$and: [
-      {driverId: userId},
-      {status: {$ne: "3"}},
-      {status: {$ne: "5"}}
-    ]});
+    const orders = await orderModel.find({
+      $and: [
+        { driverId: userId },
+        { status: { $ne: "3" } },
+        { status: { $ne: "5" } },
+      ],
+    });
 
-    if(orders.length == 0){
-      return res.json(helper.generateServerResponse(0, "177"));
-    }
-
-    const result = await Promise.all(    
-      orders.map(async (order) => {        
-        return orderDetails(order);
-      })
-    )
-
-    return res.json(helper.generateServerResponse(1, "S", result));
-  }
-  catch(err){
-    console.log(err);
-    return res.json(helper.generateServerResponse(0, "I"));
-  }
-}
-
-exports.getPendingDeliveries = async (req, res) => {
-  try{
-    const {userId} = req.user;
-
-    const user = driverDetails.findById(userId);
-
-    if(user.isOnOff === 0){
-      return res.json(helper.generateServerResponse(0, "201"));
-    }
-
-    const orders = await orderModel.find({$and: [
-      {status : "2"},
-      {orderState: "1"},
-      {orderState: "2"},
-      {driverId: {$type: 'undefined'}}
-    ]});
-
-    if(orders.length == 0){
+    if (orders.length == 0) {
       return res.json(helper.generateServerResponse(0, "177"));
     }
 
     const result = await Promise.all(
       orders.map(async (order) => {
-        const merchantAddress = await merchantModel.findOne({userId: order.merchantId});
+        return orderDetails(order);
+      })
+    );
+
+    return res.json(helper.generateServerResponse(1, "S", result));
+  } catch (err) {
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "I"));
+  }
+};
+
+exports.getPendingDeliveries = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const user = driverDetails.findById(userId);
+
+    if (user.isOnOff === 0) {
+      return res.json(helper.generateServerResponse(0, "201"));
+    }
+
+    const orders = await orderModel.find({
+      $and: [
+        { status: "2" },
+        { orderState: "1" },
+        { orderState: "2" },
+        { driverId: { $type: "undefined" } },
+      ],
+    });
+
+    if (orders.length == 0) {
+      return res.json(helper.generateServerResponse(0, "177"));
+    }
+
+    const result = await Promise.all(
+      orders.map(async (order) => {
+        const merchantAddress = await merchantModel.findOne({
+          userId: order.merchantId,
+        });
         const userAddress = await userAddressModel.findById(order.addressId);
         return {
           orderId: order._id ? order._id : "",
@@ -1005,36 +1018,36 @@ exports.getPendingDeliveries = async (req, res) => {
           pickUp: merchantAddress.address ? merchantAddress.address : "",
           dropOff: userAddress.fullAddress ? userAddress.fullAddress : "",
           estFare: order.deliveryFeePerKm ? order.deliveryFeePerKm : "",
-        }
+        };
       })
-    )
+    );
 
     return res.json(helper.generateServerResponse(1, "S", result));
-
-  }
-  catch(err){
+  } catch (err) {
     console.log(err);
     return res.json(helper.generateServerResponse(0, "197"));
   }
-}
+};
 
 exports.orderDetails = async (req, res) => {
-  try{    
-    const {userId} = req.user;
+  try {
+    const { userId } = req.user;
 
-    const orderId = req.params.orderId;    
+    const orderId = req.params.orderId;
 
-    const order = await orderModel.findById(orderId);    
+    const order = await orderModel.findById(orderId);
 
-    if(!order){
+    if (!order) {
       return res.json(helper.generateServerResponse(0, "168"));
     }
-    
-    if(order.driverId.toString() != userId){
+
+    if (order.driverId.toString() != userId) {
       return res.json(helper.generateServerResponse(0, "119"));
     }
 
-    const merchantDetails = await merchantModel.findOne({userId: order.merchantId});
+    const merchantDetails = await merchantModel.findOne({
+      userId: order.merchantId,
+    });
     const merchant = await userMasterModel.findById(order.merchantId);
     const customer = await userMasterModel.findById(order.userId);
 
@@ -1045,104 +1058,101 @@ exports.orderDetails = async (req, res) => {
       merchantName: merchant.name ? merchant.name : "",
       merchantAddress: merchantDetails.address ? merchantDetails.address : "",
       merchantLatitude: "",
-      merchantLongitude : "",
+      merchantLongitude: "",
       customerName: customer.name ? customer.name : "",
       customerContact: customer.mobile ? customer.mobile : "",
-      paymentStatus: order.paymentStatus ? order.paymentStatus : "",      
-    }
+      paymentStatus: order.paymentStatus ? order.paymentStatus : "",
+    };
 
     return res.json(helper.generateServerResponse(1, "S", result));
-  }
-  catch(err){
+  } catch (err) {
     console.log(err);
     return res.json(helper.generateServerResponse(0, "197"));
   }
-}
+};
 
 exports.orderPickedUp = async (req, res) => {
-  try{
-    const {userId} = req.user;
+  try {
+    const { userId } = req.user;
 
     const driver = await userMasterModel.findById(userId);
 
-    const checkReqKey = [
-      "orderId",
-      "latitude",
-      "longitude"
-    ];
+    const checkReqKey = ["orderId", "latitude", "longitude"];
 
-    let response = helper.validateJSON(req.body[constants.APPNAME], checkReqKey);
+    let response = helper.validateJSON(
+      req.body[constants.APPNAME],
+      checkReqKey
+    );
 
-    if(response == 0){
+    if (response == 0) {
       return res.json(helper.generateServerResponse(0, "I"));
     }
 
-    const {
-      orderId,
-      latitude,
-      longitude,
-    } = req.body[constants.APPNAME];
-        
-    const order = await orderModel.findById(orderId);    
-    
-    if(!order){
+    const { orderId, latitude, longitude } = req.body[constants.APPNAME];
+
+    const order = await orderModel.findById(orderId);
+
+    if (!order) {
       return res.json(helper.generateServerResponse(0, "168"));
     }
 
-    if(order.driverId.toString() != userId){
+    if (order.driverId.toString() != userId) {
       return res.json(helper.generateServerResponse(0, "119"));
     }
-    
-    const merchant = await merchantModel.findOne({userId: order.merchantId});
-    const user = await userMasterModel.findById(order.userId);    
+
+    const merchant = await merchantModel.findOne({ userId: order.merchantId });
+    const user = await userMasterModel.findById(order.userId);
 
     let mlatitude = merchant.latitude;
     let mlongitude = merchant.longitude;
 
-    if(helper.checkDistance(latitude, longitude, mlatitude, mlongitude) > 0.03){ // If driver is not near the pickup location
+    if (
+      helper.checkDistance(latitude, longitude, mlatitude, mlongitude) > 0.03
+    ) {
+      // If driver is not near the pickup location
       return res.json(helper.generateServerResponse(0, "202"));
-    }    
+    }
 
     order.status = "4";
-    order.save({validateBeforeSave: false});
+    order.save({ validateBeforeSave: false });
 
-    
-
-    helper.sendFcmMessage("Order picked up" ,`${driver.name} has picked up your order and on his way to deliver!`, token);
+    helper.sendFcmMessage(
+      "Order picked up",
+      `${driver.name} has picked up your order and on his way to deliver!`,
+      token
+    );
 
     return res.json(helper.generateServerResponse(1, "191", order));
-  }
-  catch(err){
+  } catch (err) {
     console.log(err);
     return res.json(helper.generateServerResponse(0, "197"));
   }
-}
+};
 
 exports.orderDelivered = async (req, res) => {
-  try{
-    const {userId} = req.user;
+  try {
+    const { userId } = req.user;
 
-    const {orderId} = req.body[constants.APPNAME];
+    const { orderId } = req.body[constants.APPNAME];
 
-    const order = await orderModel.findById(orderId);    
-    
-    if(!order){
+    const order = await orderModel.findById(orderId);
+
+    if (!order) {
       return res.json(helper.generateServerResponse(0, "168"));
     }
 
-    if(order.driverId.toString() != userId){
+    if (order.driverId.toString() != userId) {
       return res.json(helper.generateServerResponse(0, "119"));
     }
 
     order.status = "5";
-    order.save({validateBeforeSave: false});
+    order.save({ validateBeforeSave: false });
 
-    helper.sendFcmMessage("Delivered" ,`Your order has been delivered!`, token);
+    helper.sendFcmMessage("Delivered", `Your order has been delivered!`, token);
 
     return res.json(helper.generateServerResponse(1, "187", order));
-  }
-  catch(err){
+  } catch (err) {
     console.log(err);
     return res.json(helper.generateServerResponse(0, "197"));
   }
-}
+};
