@@ -116,6 +116,8 @@ const messages = function (resMsg) {
   codes[202] = "Please reach near the pickup location to verify order!";
   codes[203] = "Video sucessfully uploaded!";
   codes[204] = "Error uploading video"
+  codes[205] = "Your profile has been rejected, try to complete your profile again."
+  codes[206] = "Your profile has been verified sucessfully!"
 
   return codes[resMsg];
 };

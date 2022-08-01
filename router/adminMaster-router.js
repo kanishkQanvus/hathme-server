@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router()
 const { addCategory } = require("../controller/category-controller");
+const adminController = require("../controller/admin-controller");
 const { loginUser, getAllUsers, getAllMerchant, ddd, GetAllCategory, changeSubCategoryStatus } = require("../controller/admin-controller")
 
 const { auth } = require("../middleware/auth")
@@ -11,6 +12,9 @@ router.route("/GetAllMerchant").get(getAllMerchant)
 router.route("/changeSubCategoryStatus").post(auth, changeSubCategoryStatus);
 router.route("/ddd").get(ddd)
 router.route("/GetAllCategory").get(GetAllCategory)
+router.route("/verifyUserDetails").post(adminController.verifyUserDetails);
+router.route("/verifyeBankDetails").post(adminController.verifyBankDetails);
+
 
 // router.route("/AllCategory").post(auth,allCategory);
 

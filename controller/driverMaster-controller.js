@@ -117,6 +117,7 @@ const filterBankDetails = async (data) => {
   }
 
   let result = {
+    accountHolderName: data.name ? data.name : "",
     bankName: data.bankName ? data.bankName : "",
     accountNumber: data.accountNumber ? data.accountNumber : "",
     ifsc: data.ifsc ? data.ifsc : "",

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const admin = require("../model/admin-model");
 const constants = require("../constants");
 const userMasterModel = require("../model/userMaster-model");
+const helper = require('../helper/apiHelper');
 const categories = require("../model/category-model");
 const mongoose = require('mongoose');
 const productCategoryMasterModel = require("../model/productCategoryMaster-model");
@@ -207,5 +208,64 @@ exports.changeSubCategoryStatus = async (req, res) => {
           data: null,
       }
   });
+  }
+}
+
+exports.verifyUserDetails = async (req, res) => {
+  try{
+    const { userId, status } = req.body[constants.APPNAME];    
+
+    const user = await userMasterModel.findById(userId);
+
+    if(!user){
+      return res.json(helper.generateServerResponse(0, "170"));
+    }
+
+    if(status == 2){
+      user.isProfileVerified = 0;
+      user.save({validateBeforeSave: false});
+
+      return res.json(helper.generateServerResponse(1, "205"))
+    }
+    else{
+      user.isProfileVerified = 1;
+      user.save({validateBeforeSave: false});
+
+      return res.json(helper.generateServerResponse(1, "206"));
+    }
+  }
+  catch(err)
+  {
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "197"));
+  }
+}
+
+exports.verifyBankDetails = async (req, res) => {
+  try{
+    const {userId, status} = req.body[constants.APPNAME];
+
+    const user = await userMasterModel.findById(userId);
+
+    if(!user){
+      return res.json(helper.generateServerResponse(0, "170"));
+    }
+
+    if(status == 2){
+      user.isProfileVerified = 0;
+      user.save({validateBeforeSave: false});
+
+      return res.json(helper.generateServerResponse(1, "205"))
+    }
+    else{
+      user.isProfileVerified = 1;
+      user.save({validateBeforeSave: false});
+
+      return res.json(helper.generateServerResponse(1, "206"));
+    }
+  }
+  catch(err){
+    console.log(err);
+    return res.json(helper.generateServerResponse(0, "197"));
   }
 }

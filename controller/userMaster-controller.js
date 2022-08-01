@@ -4,7 +4,8 @@ const firendListModel = require("../model/friendList-model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const QRCode = require("qrcode");
-const multer = require("multer");
+const formidable = require("formidable");
+const fs = require("fs");
 const userMasterModel = require("../model/userMaster-model");
 const constants = require("../constants");
 const helper = require("../helper/apiHelper");
@@ -2790,76 +2791,100 @@ exports.findUser = async (req, res) => {
   }
 };
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const type = req.body.type;
-    let path;
-    if (type == 1) {
-      path = "./uploads/userVideos/videos";
-    } else if (type == 2) {
-      path = "./uploads/userVideos/reels";
-    }
-
-    cb(null, path);
-  },
-  filename: (req, file, cb) => {
-    const ext = file.mimetype.split("/")[1];
-    cb(null, `user-${req.user.userId}-${Date.now()}.${ext}`);
-  },
-});
-
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("video")) {
-    cb(null, true);
-  } else {
-    cb(new Error("Not a video File!!"), false);
+const isFileValid = (file) => {
+  const type = file.mimetype.split("/").pop();
+  const validTypes = ["mp4", "mkv", "mov", "gif"];
+  if (validTypes.indexOf(type) === -1) {
+    return false;
   }
+  return true;
 };
 
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-}).single("video");
-
-exports.videoUpload = async (req, res, next) => {
+exports.videoUpload = async (req, res) => {
   try {
     const { userId } = req.user;
+    const user = await userMasterModel.findById(userId);
+    if (!userId) {
+      return res.json(helper.generateServerResponse(1, "I"));
+    } else if (!user) {
+      return res.json(helper.generateServerResponse(0, 170));
+    }
+    if (user) {
+      const form = new formidable.IncomingForm();
+      // const uploadFolder = "./uploads/userVideos/videos/";
+      // form.uploadDir = uploadFolder;
+      form.uploadDir = "uploads/";
 
-    return upload(req, res, async (err) => {
-      if (err) {
-        console.log("Error uploading file!");
-        return res.json(helper.generateServerResponse(0, "204"));
-      }
+      // Parsing
+      form.parse(req, async (err, fields, files) => {
+        // const defaultStorage = files.video.filepath;
+        // console.log(defaultStorage);
+        // console.log(form);
+        // const uploadFolder = "./uploads/userVideos/videos/";
+        const type = fields.type;
 
-      let data = req.file;
-      let type = req.body.type;
+        let uploadFolder;                
+        
+        if (type == 1) {
+          uploadFolder = "uploads/userVideos/videos/";
+        } else if (type == 2) {
+          uploadFolder = "uploads/userVideos/reels/";
+        }
+                
+        if (err) {
+          console.log("Error parsing the files");
+          return res.status(400).json({
+            status: "Fail",
+            message: "There was an error parsing the files",
+            error: err,
+          });
+        }
+        const file = files.video;
 
-      const user = await userMasterModel.findById(userId);
-      let name = data.filename;
+        // checks if the file is valid
+        const isValid = isFileValid(file);
+        const ext = files.video.mimetype.split("/")[1];
 
-      destination = data.destination.slice(1);
+        // creates a valid name by removing spaces
+        const fileName = encodeURIComponent(
+          file.newFilename.replace(/\s/g, "-") + "." + ext
+        );
 
-      let path = process.env.SERVER + destination + "/" + name;
-      if (!type) {
-        return res.json(helper.generateServerResponse(1, "I"));
-      }
+        if (!isValid) {
+          // throes error if file isn't valid
+          return res.status(400).json({
+            status: "Fail",
+            message: "The file type is not a valid type",
+          });
+        }
+        try {
+          // renames the file in the directory
+          fs.renameSync(file.filepath, `${uploadFolder + fileName}`);
+        } catch (error) {
+          console.log(error);
+        }
 
-      if (!user) {
-        return res.json(helper.generateServerResponse(0, "170"));
-      }
-
-      const data2 = {
-        userId: userId,
-        type: type,
-        videoUrl: path,
-      };
-      const result = await UserVideoModel(data2);
-      result.save();
-
-      return res.json(helper.generateServerResponse(1, "203", result));
-    });
+        const videoPath = process.env.SERVER + uploadFolder + fileName;
+        const data2 = {
+          userId: userId,
+          type: type,
+          videoUrl: videoPath,
+        };
+        const result = UserVideoModel(data2);
+        result.save();
+        console.log(result);
+        res.status(200).json({
+          status: "success",
+          message: "Video sucessfully uploaded",
+          fullName: user.name,
+          emailId: user.email,
+          mobileNo: user.mobile,
+          result,
+        });
+      });
+    }
   } catch (error) {
+    res.json(helper.generateServerResponse(0, "I"));
     console.log(error);
-    return res.json(helper.generateServerResponse(0, "I"));
   }
 };
