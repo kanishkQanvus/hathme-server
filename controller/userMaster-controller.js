@@ -2813,7 +2813,7 @@ exports.videoUpload = async (req, res) => {
       const form = new formidable.IncomingForm();
       // const uploadFolder = "./uploads/userVideos/videos/";
       // form.uploadDir = uploadFolder;
-      form.uploadDir = "uploads/";
+      form.uploadDir = "uploads/userVideos/videos";
 
       // Parsing
       form.parse(req, async (err, fields, files) => {
